@@ -209,7 +209,7 @@ xyz_pos_t cartes;
 void report_current_position() {
   const xyz_pos_t lpos = current_position.asLogical();
   SERIAL_ECHOPAIR("X:", lpos.x, " Y:", lpos.y, " Z:", lpos.z, " E:", current_position.e);
-
+	SERIAL_CHAR(' ');
   stepper.report_positions();
 
   #if IS_SCARA

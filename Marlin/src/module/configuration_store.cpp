@@ -2834,7 +2834,7 @@ void MarlinSettings::reset() {
     /**
      * Announce current units, in case inches are being displayed
      */
-    CONFIG_ECHO_START();
+    /*CONFIG_ECHO_START();
     #if ENABLED(INCH_MODE_SUPPORT)
       SERIAL_ECHOPGM("  G2");
       SERIAL_CHAR(parser.linear_unit_factor == 1.0 ? '1' : '0');
@@ -2844,9 +2844,9 @@ void MarlinSettings::reset() {
       SERIAL_ECHOPGM("  G21    ; Units in mm");
       say_units(false);
     #endif
-    SERIAL_EOL();
+    SERIAL_EOL();*/
 
-    #if HAS_LCD_MENU
+    /*#if HAS_LCD_MENU
 
       // Temperature units - for Ultipanel temperature options
 
@@ -2862,13 +2862,11 @@ void MarlinSettings::reset() {
 
     #endif
 
-    SERIAL_EOL();
+    SERIAL_EOL();*/
 
-    #if DISABLED(NO_VOLUMETRICS)
+    /*#if DISABLED(NO_VOLUMETRICS)
 
-      /**
-       * Volumetric extrusion M200
-       */
+
       if (!forReplay) {
         config_heading(forReplay, PSTR("Filament settings:"), false);
         if (parser.volumetric_enabled)
@@ -2893,14 +2891,18 @@ void MarlinSettings::reset() {
         CONFIG_ECHO_MSG("  M200 D0");
 
     #endif // !NO_VOLUMETRICS
-
-    CONFIG_ECHO_HEADING("Steps per unit:");
+*/
+    //CONFIG_ECHO_HEADING("Steps per unit:");
     report_M92(!forReplay);
+#if ENABLED(mWorkProtocol)
+	SERIAL_CHAR('Config:');
+#else
+	CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
+	CONFIG_ECHO_START();
+#endif
 
-    CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
-    CONFIG_ECHO_START();
     SERIAL_ECHOLNPAIR_P(
-        PSTR("  M203 X"), LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS])
+        PSTR(" M203 X"), LINEAR_UNIT(planner.settings.max_feedrate_mm_s[X_AXIS])
       , SP_Y_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Y_AXIS])
       , SP_Z_STR, LINEAR_UNIT(planner.settings.max_feedrate_mm_s[Z_AXIS])
       #if DISABLED(DISTINCT_E_FACTORS)
@@ -2911,16 +2913,20 @@ void MarlinSettings::reset() {
       CONFIG_ECHO_START();
       LOOP_L_N(i, E_STEPPERS) {
         SERIAL_ECHOLNPAIR_P(
-            PSTR("  M203 T"), (int)i
+            PSTR("Config: M203 T"), (int)i
           , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_feedrate_mm_s[E_AXIS_N(i)])
         );
       }
     #endif
-
+#if ENABLED(mWorkProtocol)
+	SERIAL_CHAR('Config:');
+#else
     CONFIG_ECHO_HEADING("Maximum Acceleration (units/s2):");
     CONFIG_ECHO_START();
+#endif
+
     SERIAL_ECHOLNPAIR_P(
-        PSTR("  M201 X"), LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS])
+        PSTR(" M201 X"), LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[X_AXIS])
       , SP_Y_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Y_AXIS])
       , SP_Z_STR, LINEAR_UNIT(planner.settings.max_acceleration_mm_per_s2[Z_AXIS])
       #if DISABLED(DISTINCT_E_FACTORS)
@@ -2935,11 +2941,15 @@ void MarlinSettings::reset() {
           , SP_E_STR, VOLUMETRIC_UNIT(planner.settings.max_acceleration_mm_per_s2[E_AXIS_N(i)])
         );
     #endif
-
+#if ENABLED(mWorkProtocol)
+	SERIAL_CHAR('Config:');
+#else
     CONFIG_ECHO_HEADING("Acceleration (units/s2): P<print_accel> R<retract_accel> T<travel_accel>");
-    CONFIG_ECHO_START();
+   CONFIG_ECHO_START();
+#endif
+
     SERIAL_ECHOLNPAIR_P(
-        PSTR("  M204 P"), LINEAR_UNIT(planner.settings.acceleration)
+        PSTR(" M204 P"), LINEAR_UNIT(planner.settings.acceleration)
       , PSTR(" R"), LINEAR_UNIT(planner.settings.retract_acceleration)
       , SP_T_STR, LINEAR_UNIT(planner.settings.travel_acceleration)
     );

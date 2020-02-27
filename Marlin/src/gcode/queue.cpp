@@ -399,7 +399,7 @@ void GCodeQueue::get_serial_commands() {
     if (length == 0 && !serial_data_available() && ELAPSED(ms, last_command_time + NO_TIMEOUTS)) {
       //
 		#if ENABLED(mWorkProtocol)
-			SERIAL_CHAR("w ");
+			SERIAL_CHAR("w\n");
 			//report_pos_step();
 		#else
 			SERIAL_ECHOLNPGM(STR_WAIT);

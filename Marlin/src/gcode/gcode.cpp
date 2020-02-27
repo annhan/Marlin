@@ -359,6 +359,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       default: parser.unknown_command_warning(); break;
     }
+	#if ENABLED(mWorkProtocol)
+		if (!no_ok) queue.ok_to_send();
+	#endif
     break;
 
     case 'M': switch (parser.codenum) {
@@ -872,8 +875,12 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
       parser.unknown_command_warning();
   }
-
+#if ENABLED(mWorkProtocol)
+#else
   if (!no_ok) queue.ok_to_send();
+#endif
+  
+ 
 }
 
 /**

@@ -173,4 +173,4 @@
 
 #endif // REPRAPWORLD_GRAPHICAL_LCD
 
-
+#define BEEPER_PIN      27

@@ -40,6 +40,7 @@
       SERIAL_CHAR(' ', axis_codes[a], ':');
       SERIAL_ECHO(dtostrf(pos[a], 1, precision, str));
     }
+	
     SERIAL_EOL();
   }
 
@@ -86,7 +87,7 @@
 
     planner.synchronize();
 
-    #if HAS_L64XX
+   /* #if HAS_L64XX
       char temp_buf[80];
       int32_t temp;
       //#define ABS_POS_SIGN_MASK 0b1111 1111 1110 0000 0000 0000 0000 0000
@@ -149,7 +150,7 @@
         REPORT_ABSOLUTE_POS(E7);
       #endif
       SERIAL_EOL();
-    #endif // HAS_L64XX
+    #endif // HAS_L64XX*/
 
     SERIAL_ECHOPGM("Stepper:");
     LOOP_XYZE(i) {
