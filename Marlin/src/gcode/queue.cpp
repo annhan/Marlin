@@ -397,9 +397,13 @@ void GCodeQueue::get_serial_commands() {
     static millis_t last_command_time = 0;
     const millis_t ms = millis();
     if (length == 0 && !serial_data_available() && ELAPSED(ms, last_command_time + NO_TIMEOUTS)) {
-      //SERIAL_ECHOLNPGM(STR_WAIT);
-	  SERIAL_CHAR("w ");
-	  report_pos_step();
+      //
+		#if ENABLED(mWorkProtocol)
+			SERIAL_CHAR("w ");
+			//report_pos_step();
+		#else
+			SERIAL_ECHOLNPGM(STR_WAIT);
+		#endif
       last_command_time = ms;
     }
   #endif

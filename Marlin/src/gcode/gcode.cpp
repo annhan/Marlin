@@ -951,9 +951,12 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
       switch (busy_state) {
         case IN_HANDLER:
         case IN_PROCESS:
-          //SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
-		  SERIAL_CHAR("b ");
-		  report_pos_step();
+		  #if ENABLED(mWorkProtocol)
+			SERIAL_CHAR("b ");
+			report_pos_step();
+		  #else
+			SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
+		  #endif
           break;
         case PAUSED_FOR_USER:
           SERIAL_ECHO_MSG(STR_BUSY_PAUSED_FOR_USER);
@@ -965,7 +968,11 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
           break;
       }
     }
-    next_busy_signal_ms = ms + host_keepalive_interval * 200UL;
+	#if ENABLED(mWorkProtocol)
+		next_busy_signal_ms = ms + host_keepalive_interval * 200UL;
+	#else
+		next_busy_signal_ms = ms + host_keepalive_interval * 1000UL;
+	#endif
   }
 
 #endif // HOST_KEEPALIVE_FEATURE

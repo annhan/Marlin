@@ -21,6 +21,10 @@
  */
 #pragma once
 
+
+#define mWorkProtocol
+
+
 /**
  * Configuration_adv.h
  *
@@ -577,7 +581,8 @@
 
 // Activate a solenoid on the active extruder with M380. Disable all with M381.
 // Define SOL0_PIN, SOL1_PIN, etc., for each extruder that has a solenoid.
-//#define EXT_SOLENOID
+#define SOL0_PIN 8
+#define EXT_SOLENOID
 
 // @section homing
 
@@ -853,7 +858,7 @@
  * vibration and surface artifacts. The algorithm adapts to provide the best possible step smoothing at the
  * lowest stepping frequencies.
  */
-//#define ADAPTIVE_STEP_SMOOTHING
+#define ADAPTIVE_STEP_SMOOTHING
 
 /**
  * Custom Microstepping
@@ -1444,9 +1449,9 @@
  *
  * Warning: Does not respect endstops!
  */
-//#define BABYSTEPPING
+#define BABYSTEPPING
 #if ENABLED(BABYSTEPPING)
-  //#define INTEGRATED_BABYSTEPPING         // EXPERIMENTAL integration of babystepping into the Stepper ISR
+  #define INTEGRATED_BABYSTEPPING         // EXPERIMENTAL integration of babystepping into the Stepper ISR
   //#define BABYSTEP_WITHOUT_HOMING
   //#define BABYSTEP_XY                     // Also enable X/Y Babystepping. Not supported on DELTA!
   #define BABYSTEP_INVERT_Z false           // Change if Z babysteps should go the other way
@@ -1648,8 +1653,8 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-//#define MINIMUM_STEPPER_POST_DIR_DELAY 650
-//#define MINIMUM_STEPPER_PRE_DIR_DELAY 650
+#define MINIMUM_STEPPER_POST_DIR_DELAY 650
+#define MINIMUM_STEPPER_PRE_DIR_DELAY 650
 
 /**
  * Minimum stepper driver pulse width (in µs)
@@ -1710,13 +1715,13 @@
 // For debug-echo: 128 bytes for the optimal speed.
 // Other output doesn't need to be that speedy.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256]
-#define TX_BUFFER_SIZE 0
+#define TX_BUFFER_SIZE 64
 
 // Host Receive Buffer Size
 // Without XON/XOFF flow control (see SERIAL_XON_XOFF below) 32 bytes should be enough.
 // To use flow control, set this buffer size to at least 1024 bytes.
 // :[0, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-//#define RX_BUFFER_SIZE 1024
+#define RX_BUFFER_SIZE 1024
 
 #if RX_BUFFER_SIZE >= 1024
   // Enable to have the controller send XON/XOFF control characters to
@@ -1741,7 +1746,7 @@
 // enter the serial receive buffer, so they cannot be blocked.
 // Currently handles M108, M112, M410
 // Does not work on boards using AT90USB (USBCON) processors!
-//#define EMERGENCY_PARSER
+#define EMERGENCY_PARSER
 
 // Bad Serial-connections can miss a received command by sending an 'ok'
 // Therefore some clients abort after 30 seconds in a timeout.
@@ -2640,14 +2645,17 @@
  *
  * See http://marlinfw.org/docs/configuration/laser_spindle.html for more config details.
  */
-//#define SPINDLE_FEATURE
+#define SPINDLE_LASER_ENA_PIN 14   // digital pin
+#define SPINDLE_LASER_PWM_PIN    7   // digital pin - MUST BE HARDWARE PWM
+#define SPINDLE_DIR_PIN          15   // digital pin
+#define SPINDLE_FEATURE
 //#define LASER_FEATURE
 #if EITHER(SPINDLE_FEATURE, LASER_FEATURE)
-  #define SPINDLE_LASER_ACTIVE_HIGH     false  // Set to "true" if the on/off function is active HIGH
+  #define SPINDLE_LASER_ACTIVE_HIGH     true  // Set to "true" if the on/off function is active HIGH
   #define SPINDLE_LASER_PWM             true   // Set to "true" if your controller supports setting the speed/power
-  #define SPINDLE_LASER_PWM_INVERT      true   // Set to "true" if the speed/power goes up when you want it to go slower
-  #define SPINDLE_LASER_POWERUP_DELAY   5000   // (ms) Delay to allow the spindle/laser to come up to speed/power
-  #define SPINDLE_LASER_POWERDOWN_DELAY 5000   // (ms) Delay to allow the spindle to stop
+  #define SPINDLE_LASER_PWM_INVERT      false   // Set to "true" if the speed/power goes up when you want it to go slower
+  #define SPINDLE_LASER_POWERUP_DELAY   1000   // (ms) Delay to allow the spindle/laser to come up to speed/power
+  #define SPINDLE_LASER_POWERDOWN_DELAY 1000   // (ms) Delay to allow the spindle to stop
 
   #if ENABLED(SPINDLE_FEATURE)
     //#define SPINDLE_CHANGE_DIR               // Enable if your spindle controller can change spindle direction
@@ -2659,12 +2667,11 @@
      *
      *  SPEED/POWER = PWM duty cycle * SPEED_POWER_SLOPE + SPEED_POWER_INTERCEPT
      *    where PWM duty cycle varies from 0 to 255
-     *
      *  set the following for your controller (ALL MUST BE SET)
      */
     #define SPEED_POWER_SLOPE    118.4
     #define SPEED_POWER_INTERCEPT  0
-    #define SPEED_POWER_MIN     5000
+    #define SPEED_POWER_MIN     0
     #define SPEED_POWER_MAX    30000    // SuperPID router controller 0 - 30,000 RPM
   #else
     #define SPEED_POWER_SLOPE      0.3922
