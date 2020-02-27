@@ -159,10 +159,13 @@ class PrintJobRecovery {
     static inline void cancel() { purge(); card.autostart_index = 0; }
 
     static void load();
-    static void save(const bool force=false
+    static void save(const bool force=
       #if ENABLED(SAVE_EACH_CMD_MODE)
-        || true
+        true
+      #else
+        false
       #endif
+      , const bool save_queue=true
     );
 
   #if PIN_EXISTS(POWER_LOSS)

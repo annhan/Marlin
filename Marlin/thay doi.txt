@@ -1,0 +1,7 @@
+file gcode/quêu.cpp
+
+dong 400 print wait thành w
+
+thay doi file gcode.cpp
+
+dong 956 tu print busy thanh print b + posi

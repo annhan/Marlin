@@ -118,18 +118,11 @@ void GCodeParser::parse(char *p) {
 
   reset(); // No codes to report
 
-  auto uppercase = [](char c) {
-    #if ENABLED(GCODE_CASE_INSENSITIVE)
-      if (WITHIN(c, 'a', 'z')) c += 'A' - 'a';
-    #endif
-    return c;
-  };
-
   // Skip spaces
   while (*p == ' ') ++p;
 
   // Skip N[-0-9] if included in the command line
-  if (uppercase(*p) == 'N' && NUMERIC_SIGNED(p[1])) {
+  if (*p == 'N' && NUMERIC_SIGNED(p[1])) {
     #if ENABLED(FASTER_GCODE_PARSER)
       //set('N', p + 1);     // (optional) Set the 'N' parameter value
     #endif
@@ -142,7 +135,7 @@ void GCodeParser::parse(char *p) {
   command_ptr = p;
 
   // Get the command letter, which must be G, M, or T
-  const char letter = uppercase(*p++);
+  const char letter = *p++;
 
   // Nullify asterisk and trailing whitespace
   char *starpos = strchr(p, '*');
@@ -278,7 +271,7 @@ void GCodeParser::parse(char *p) {
     bool quoted_string_arg = false;
   #endif
   string_arg = nullptr;
-  while (const char param = uppercase(*p++)) {  // Get the next parameter. A NUL ends the loop
+  while (const char param = *p++) {              // Get the next parameter. A NUL ends the loop
 
     // Special handling for M32 [P] !/path/to/file.g#
     // The path must be the last parameter
@@ -296,14 +289,14 @@ void GCodeParser::parse(char *p) {
       }
     #endif
 
+    // Arguments MUST be uppercase for fast GCode parsing
     #if ENABLED(FASTER_GCODE_PARSER)
-      // Arguments MUST be uppercase for fast GCode parsing
-      #define PARAM_OK(P) WITHIN((P), 'A', 'Z')
+      #define PARAM_TEST WITHIN(param, 'A', 'Z')
     #else
-      #define PARAM_OK(P) true
+      #define PARAM_TEST true
     #endif
 
-    if (PARAM_OK(param)) {
+    if (PARAM_TEST) {
 
       while (*p == ' ') p++;                    // Skip spaces between parameters & values
 
