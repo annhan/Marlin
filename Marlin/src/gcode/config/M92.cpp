@@ -25,7 +25,7 @@
 
 void report_M92(const bool echo=true, const int8_t e=-1) {
 #if ENABLED(mWorkProtocol)
-	SERIAL_CHAR('Config:');
+	SERIAL_CHAR("Config:");
 #else
 	if (echo) SERIAL_ECHO_START(); else SERIAL_CHAR(' ');
 #endif

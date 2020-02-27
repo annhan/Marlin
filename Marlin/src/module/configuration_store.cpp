@@ -2895,7 +2895,7 @@ void MarlinSettings::reset() {
     //CONFIG_ECHO_HEADING("Steps per unit:");
     report_M92(!forReplay);
 #if ENABLED(mWorkProtocol)
-	SERIAL_CHAR('Config:');
+	SERIAL_CHAR("Config:");
 #else
 	CONFIG_ECHO_HEADING("Maximum feedrates (units/s):");
 	CONFIG_ECHO_START();
@@ -2919,7 +2919,7 @@ void MarlinSettings::reset() {
       }
     #endif
 #if ENABLED(mWorkProtocol)
-	SERIAL_CHAR('Config:');
+	SERIAL_CHAR("Config:");
 #else
     CONFIG_ECHO_HEADING("Maximum Acceleration (units/s2):");
     CONFIG_ECHO_START();
@@ -2942,7 +2942,7 @@ void MarlinSettings::reset() {
         );
     #endif
 #if ENABLED(mWorkProtocol)
-	SERIAL_CHAR('Config:');
+	SERIAL_CHAR("Config:");
 #else
     CONFIG_ECHO_HEADING("Acceleration (units/s2): P<print_accel> R<retract_accel> T<travel_accel>");
    CONFIG_ECHO_START();
