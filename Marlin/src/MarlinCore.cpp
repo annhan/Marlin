@@ -726,7 +726,7 @@ void idle(
   );
 
   thermalManager.manage_heater();
-
+/*
   #if ENABLED(PRINTCOUNTER)
     print_job_timer.tick();
   #endif
@@ -745,7 +745,7 @@ void idle(
       }
     }
   #endif
-
+*/
   #ifdef HAL_IDLETASK
     HAL_idletask();
   #endif
@@ -1191,7 +1191,8 @@ void setup() {
  *    as long as idle() or manage_inactivity() are being called.
  */
 void report_pos_step(){
-	stepper.report_positions();
+	//stepper.report_positions();
+	report_current_position();
 }
 void loop() {
   do {

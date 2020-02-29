@@ -216,7 +216,11 @@ void report_current_position() {
     scara_report_positions();
   #endif
 }
+void report_current_position_mWork(){
+  const xyz_pos_t lpos = current_position.asLogical();
+  SERIAL_ECHOPAIR("X:", lpos.x, " Y:", lpos.y, " Z:", lpos.z, " E:", current_position.e);
 
+}
 /**
  * sync_plan_position
  *
