@@ -110,7 +110,7 @@
   #include "feature/I2CPositionEncoder.h"
 #endif
 
-#if HAS_TRINAMIC && DISABLED(PSU_DEFAULT_OFF)
+#if HAS_TRINAMIC_CONFIG && DISABLED(PSU_DEFAULT_OFF)
   #include "feature/tmc_util.h"
 #endif
 
@@ -165,7 +165,7 @@
   #include "feature/fanmux.h"
 #endif
 
-#if DO_SWITCH_EXTRUDER || ANY(SWITCHING_NOZZLE, PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER, ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
+#if DO_SWITCH_EXTRUDER || ANY(SWITCHING_NOZZLE, PARKING_EXTRUDER, MAGNETIC_PARKING_EXTRUDER, ELECTROMAGNETIC_SWITCHING_TOOLHEAD, SWITCHING_TOOLHEAD)
   #include "module/tool_change.h"
 #endif
 
@@ -192,7 +192,15 @@ const char NUL_STR[] PROGMEM = "",
            SP_X_STR[] PROGMEM = " X",
            SP_Y_STR[] PROGMEM = " Y",
            SP_Z_STR[] PROGMEM = " Z",
-           SP_E_STR[] PROGMEM = " E";
+           SP_E_STR[] PROGMEM = " E",
+              X_LBL[] PROGMEM =  "X:",
+              Y_LBL[] PROGMEM =  "Y:",
+              Z_LBL[] PROGMEM =  "Z:",
+              E_LBL[] PROGMEM =  "E:",
+           SP_X_LBL[] PROGMEM = " X:",
+           SP_Y_LBL[] PROGMEM = " Y:",
+           SP_Z_LBL[] PROGMEM = " Z:",
+           SP_E_LBL[] PROGMEM = " E:";
 
 bool Running = true;
 
@@ -233,11 +241,8 @@ void setup_powerhold() {
     OUT_WRITE(SUICIDE_PIN, !SUICIDE_PIN_INVERTING);
   #endif
   #if ENABLED(PSU_CONTROL)
-    #if ENABLED(PSU_DEFAULT_OFF)
-      powersupply_on = true;  PSU_OFF();
-    #else
-      powersupply_on = false; PSU_ON();
-    #endif
+    powersupply_on = ENABLED(PSU_DEFAULT_OFF);
+    if (ENABLED(PSU_DEFAULT_OFF)) PSU_OFF(); else PSU_ON();
   #endif
 }
 
@@ -420,6 +425,7 @@ void startOrResumeJob() {
     bool did_state = true;
     switch (card.sdprinting_done_state) {
 
+
       #if ENABLED(PRINTER_EVENT_LEDS)
         case 1:
           printerEventLEDs.onPrintCompleted();  // Change LED color for Print Completed
@@ -435,6 +441,7 @@ void startOrResumeJob() {
               "60"                              // ...for 1 minute with no LCD
             #endif
           ));
+
           break;
       #endif
 
@@ -503,31 +510,19 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
   }
 
   // Prevent steppers timing-out in the middle of M600
-  #if BOTH(ADVANCED_PAUSE_FEATURE, PAUSE_PARK_NO_STEPPER_TIMEOUT)
-    #define MOVE_AWAY_TEST !did_pause_print
-  #else
-    #define MOVE_AWAY_TEST true
-  #endif
+  #define STAY_TEST (BOTH(ADVANCED_PAUSE_FEATURE, PAUSE_PARK_NO_STEPPER_TIMEOUT) && did_pause_print)
 
   if (stepper_inactive_time) {
     static bool already_shutdown_steppers; // = false
     if (planner.has_blocks_queued())
       gcode.reset_stepper_timeout();
-    else if (MOVE_AWAY_TEST && !ignore_stepper_queue && ELAPSED(ms, gcode.previous_move_ms + stepper_inactive_time)) {
+    else if (!STAY_TEST && !ignore_stepper_queue && ELAPSED(ms, gcode.previous_move_ms + stepper_inactive_time)) {
       if (!already_shutdown_steppers) {
         already_shutdown_steppers = true;  // L6470 SPI will consume 99% of free time without this
-        #if ENABLED(DISABLE_INACTIVE_X)
-          DISABLE_AXIS_X();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_Y)
-          DISABLE_AXIS_Y();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_Z)
-          DISABLE_AXIS_Z();
-        #endif
-        #if ENABLED(DISABLE_INACTIVE_E)
-          disable_e_steppers();
-        #endif
+        if (ENABLED(DISABLE_INACTIVE_X)) DISABLE_AXIS_X();
+        if (ENABLED(DISABLE_INACTIVE_Y)) DISABLE_AXIS_Y();
+        if (ENABLED(DISABLE_INACTIVE_Z)) DISABLE_AXIS_Z();
+        if (ENABLED(DISABLE_INACTIVE_E)) disable_e_steppers();
         #if HAS_LCD_MENU && ENABLED(AUTO_BED_LEVELING_UBL)
           if (ubl.lcd_map_control) {
             ubl.lcd_map_control = false;
@@ -652,7 +647,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
       // travel moves have been received so enact them
       delayed_move_time = 0xFFFFFFFFUL; // force moves to be done
       destination = current_position;
-      prepare_move_to_destination();
+      prepare_line_to_destination();
     }
   #endif
 
@@ -876,6 +871,7 @@ void stop() {
  *    • Digipot I2C
  *    • Z probe sled
  *    • status LEDs
+ *    • Max7219
  */
 void setup() {
 
@@ -887,10 +883,6 @@ void setup() {
 
   #if ENABLED(SMART_EFFECTOR) && PIN_EXISTS(SMART_EFFECTOR_MOD)
     OUT_WRITE(SMART_EFFECTOR_MOD_PIN, LOW);   // Put Smart Effector into NORMAL mode
-  #endif
-
-  #if ENABLED(MAX7219_DEBUG)
-    max7219.init();
   #endif
 
   #if ENABLED(DISABLE_DEBUG)
@@ -1136,6 +1128,10 @@ void setup() {
     pe_solenoid_init();
   #endif
 
+  #if ENABLED(SWITCHING_TOOLHEAD)
+    swt_init();
+  #endif
+
   #if ENABLED(ELECTROMAGNETIC_SWITCHING_TOOLHEAD)
     est_init();
   #endif
@@ -1164,7 +1160,7 @@ void setup() {
     host_action_prompt_end();
   #endif
 
-  #if HAS_TRINAMIC && DISABLED(PSU_DEFAULT_OFF)
+  #if HAS_TRINAMIC_CONFIG && DISABLED(PSU_DEFAULT_OFF)
     test_tmc_connection(true, true, true, true);
   #endif
 
@@ -1174,6 +1170,10 @@ void setup() {
 
   #if HAS_SERVICE_INTERVALS
     ui.reset_status(true);  // Show service messages or keep current status
+  #endif
+
+  #if ENABLED(MAX7219_DEBUG)
+    max7219.init();
   #endif
 }
 
@@ -1196,7 +1196,6 @@ void report_pos_step(){
 }
 void loop() {
   do {
-
     idle();
 
     #if ENABLED(SDSUPPORT)
@@ -1209,9 +1208,5 @@ void loop() {
 
     endstops.event_handler();
 
-  } while (false        // Return to caller for best compatibility
-    #ifdef __AVR__
-      || true           // Loop forever on slower (AVR) boards
-    #endif
-  );
+  } while (ENABLED(__AVR__)); // Loop forever on slower (AVR) boards
 }

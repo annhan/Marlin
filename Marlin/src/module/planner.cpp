@@ -2397,14 +2397,8 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       LOOP_XYZE(i)
     #endif
     {
-      const float jerk = ABS(current_speed[i]);   // cs : Starting from zero, change in speed for this axis
-
-      float maxj = max_jerk[i];                   // mj : The max jerk setting for this axis
-
-      #ifdef TRAVEL_EXTRA_XYJERK
-        if ((TRAVEL_EXTRA_XYJERK) && !de <= 0 && (i == X_AXIS || i == Y_AXIS))
-          maxj += TRAVEL_EXTRA_XYJERK;            // Extra jerk allowance for travel moves
-      #endif
+      const float jerk = ABS(current_speed[i]),   // cs : Starting from zero, change in speed for this axis
+                  maxj = (max_jerk[i] + (i == X_AXIS || i == Y_AXIS ? extra_xyjerk : 0.0f)); // mj : The max jerk setting for this axis
 
       if (jerk > maxj) {                          // cs > mj : New current speed too fast?
         if (limited) {                            // limited already?
@@ -2457,8 +2451,12 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
             : // v_exit <= v_entry                coasting             axis reversal
               ( (v_entry < 0 || v_exit > 0) ? (v_entry - v_exit) : _MAX(-v_exit, v_entry) );
 
-        if (jerk > max_jerk[axis]) {
-          v_factor *= max_jerk[axis] / jerk;
+
+        const float maxj = (max_jerk[axis] + (axis == X_AXIS || axis == Y_AXIS ? extra_xyjerk : 0.0f));
+
+        if (jerk > maxj) {
+          v_factor *= maxj / jerk;
+
           ++limited;
         }
       }
@@ -2618,21 +2616,24 @@ bool Planner::buffer_segment(const float &a, const float &b, const float &c, con
       SERIAL_ECHOPAIR("->", target.a);
       SERIAL_ECHOPAIR(") B:", b);
     #else
-      SERIAL_ECHOPAIR(" X:", a);
+      SERIAL_ECHOPAIR_P(SP_X_LBL, a);
       SERIAL_ECHOPAIR(" (", position.x);
       SERIAL_ECHOPAIR("->", target.x);
-      SERIAL_ECHOPAIR(") Y:", b);
+      SERIAL_CHAR(')');
+      SERIAL_ECHOPAIR_P(SP_Y_LBL, b);
     #endif
     SERIAL_ECHOPAIR(" (", position.y);
     SERIAL_ECHOPAIR("->", target.y);
     #if ENABLED(DELTA)
       SERIAL_ECHOPAIR(") C:", c);
     #else
-      SERIAL_ECHOPAIR(") Z:", c);
+      SERIAL_CHAR(')');
+      SERIAL_ECHOPAIR_P(SP_Z_LBL, c);
     #endif
     SERIAL_ECHOPAIR(" (", position.z);
     SERIAL_ECHOPAIR("->", target.z);
-    SERIAL_ECHOPAIR(") E:", e);
+    SERIAL_CHAR(')');
+    SERIAL_ECHOPAIR_P(SP_E_LBL, e);
     SERIAL_ECHOPAIR(" (", position.e);
     SERIAL_ECHOPAIR("->", target.e);
     SERIAL_ECHOLNPGM(")");
