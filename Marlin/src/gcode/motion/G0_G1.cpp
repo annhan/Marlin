@@ -58,7 +58,7 @@ void GcodeSuite::G0_G1(
         | (parser.seen('Z') ? _BV(Z_AXIS) : 0) )
     #endif
   ) {
-
+	//SERIAL_CHAR("ssssssssssssss\n");
     #ifdef G0_FEEDRATE
       feedRate_t old_feedrate;
       #if ENABLED(VARIABLE_G0_FEEDRATE)

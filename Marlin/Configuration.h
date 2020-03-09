@@ -69,6 +69,40 @@
 // For a SCARA printer start with the configuration files in
 // config/examples/SCARA and customize for your machine.
 //
+//===========================================================================
+//========================= SCARA Settings ==================================
+//===========================================================================
+// SCARA-mode for Marlin has been developed by QHARLEY in ZA in 2012/2013. Implemented
+// and slightly reworked by JCERNY in 06/2014 with the goal to bring it into Master-Branch
+// QHARLEYS Autobedlevelling has not been ported, because Marlin has now Bed-levelling
+// You might need Z-Min endstop on SCARA-Printer to use this feature. Actually untested!
+// Uncomment to use Morgan scara mode
+
+#define MORGAN_SCARA
+//
+#if EITHER(MORGAN_SCARA, MP_SCARA)
+  // If movement is choppy try lowering this value
+  #define SCARA_SEGMENTS_PER_SECOND 200
+  // Length of inner and outer support arms. Measure arm lengths precisely.
+  #define SCARA_LINKAGE_1  43    // (mm)
+  #define SCARA_LINKAGE_2  23    // (mm)
+  // SCARA tower offset (position of Tower relative to bed zero position)
+  // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
+  #define SCARA_OFFSET_X    -20       // (mm)
+  #define SCARA_OFFSET_Y    -50       // (mm)
+  #if ENABLED(MORGAN_SCARA)
+    //#define DEBUG_SCARA_KINEMATICS
+    #define SCARA_FEEDRATE_SCALING  // Convert XY feedrate from mm/s to degrees/s on the fly
+    // Radius around the center where the arm cannot reach
+    #define MIDDLE_DEAD_ZONE_R   0  // (mm)
+
+    #define THETA_HOMING_OFFSET  0  // Calculated from Calibration Guide and M360 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
+    #define PSI_HOMING_OFFSET    0  // Calculated from Calibration Guide and M364 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
+  #elif ENABLED(MP_SCARA)
+    #define SCARA_OFFSET_THETA1  12 // degrees
+    #define SCARA_OFFSET_THETA2 131 // degrees
+  #endif
+#endif
 
 // @section info
 
@@ -623,7 +657,7 @@
 #define USE_ZMAX_PLUG
 
 // Enable pullup for all endstops to prevent a floating state
-#define ENDSTOPPULLUPS
+//#define ENDSTOPPULLUPS
 #if DISABLED(ENDSTOPPULLUPS)
   // Disable ENDSTOPPULLUPS to set pullups individually
   #define ENDSTOPPULLUP_XMAX
@@ -706,7 +740,7 @@
  *
  * :[2,3,4,5,6,7]
  */
-#define ENDSTOP_NOISE_THRESHOLD 5
+//#define ENDSTOP_NOISE_THRESHOLD 5
 
 //=============================================================================
 //============================== Movement Settings ============================
@@ -743,7 +777,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 4000, 4000, 4000, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 500, 500,500, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -818,7 +852,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-#define S_CURVE_ACCELERATION
+//#define S_CURVE_ACCELERATION
 
 //===========================================================================
 //============================= Z Probe Options =============================
@@ -1079,7 +1113,7 @@
 //#define Z_HOMING_HEIGHT  4      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                   // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
-//#define Z_AFTER_HOMING  10      // (mm) Height to move to after homing Z
+//#define Z_AFTER_HOMING  100      // (mm) Height to move to after homing Z
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
@@ -1090,18 +1124,18 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 20000
-#define Y_BED_SIZE 20000
+#define X_BED_SIZE 66
+#define Y_BED_SIZE 66
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
+#define X_MIN_POS -66
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
-#define Z_MAX_POS 20000
+#define Z_MAX_POS 8000
 
-/**
+/*
  * Software Endstops
  *
  * - Prevent moves outside the set machine bounds.
@@ -1111,6 +1145,7 @@
  */
 
 // Min software endstops constrain movement within minimum coordinate bounds
+
 #define MIN_SOFTWARE_ENDSTOPS
 #if ENABLED(MIN_SOFTWARE_ENDSTOPS)
   #define MIN_SOFTWARE_ENDSTOP_X
@@ -1119,6 +1154,7 @@
 #endif
 
 // Max software endstops constrain movement within maximum coordinate bounds
+
 #define MAX_SOFTWARE_ENDSTOPS
 #if ENABLED(MAX_SOFTWARE_ENDSTOPS)
   #define MAX_SOFTWARE_ENDSTOP_X
@@ -1127,10 +1163,12 @@
 #endif
 
 #if EITHER(MIN_SOFTWARE_ENDSTOPS, MAX_SOFTWARE_ENDSTOPS)
+
   //#define SOFT_ENDSTOPS_MENU_ITEM  // Enable/Disable software endstops from the LCD
+  
 #endif
 
-/**
+/*
  * Filament Runout Sensors
  * Mechanical or opto endstops are used to check for the presence of filament.
  *
