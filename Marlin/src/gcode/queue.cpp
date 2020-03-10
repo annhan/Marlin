@@ -361,6 +361,10 @@ inline void process_stream_char(const char c, uint8_t &sis, char (&buff)[MAX_CMD
     sis = PS_EOL;               // Skip the rest on overflow
 }
 
+/**
+ * Handle a line being completed. For an empty line
+ * keep sensor readings going and watchdog alive.
+ */
 inline bool process_line_done(uint8_t &sis, char (&buff)[MAX_CMD_SIZE], int &ind) {
   sis = PS_NORMAL;
   buff[ind] = 0;
@@ -397,7 +401,13 @@ void GCodeQueue::get_serial_commands() {
     static millis_t last_command_time = 0;
     const millis_t ms = millis();
     if (length == 0 && !serial_data_available() && ELAPSED(ms, last_command_time + NO_TIMEOUTS)) {
-      SERIAL_ECHOLNPGM(STR_WAIT);
+      //
+		#if ENABLED(mWorkProtocol)
+			SERIAL_CHAR("w\n");
+			//report_pos_step();
+		#else
+			SERIAL_ECHOLNPGM(STR_WAIT);
+		#endif
       last_command_time = ms;
     }
   #endif
@@ -527,7 +537,8 @@ void GCodeQueue::get_serial_commands() {
     while (length < BUFSIZE && !card_eof) {
       const int16_t n = card.get();
       card_eof = card.eof();
-      if (n < 0 && !card_eof) { SERIAL_ERROR_MSG(STR_SD_ERR_READ); continue; }
+
+      if (n < 0 && !card_eof) { SERIAL_ERROR_MSG(MSG_SD_ERR_READ); continue; }
 
       const char sd_char = (char)n;
       const bool is_eol = sd_char == '\n' || sd_char == '\r';

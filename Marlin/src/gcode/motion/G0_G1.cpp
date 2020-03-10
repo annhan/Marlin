@@ -58,7 +58,7 @@ void GcodeSuite::G0_G1(
         | (parser.seen('Z') ? _BV(Z_AXIS) : 0) )
     #endif
   ) {
-
+	//SERIAL_CHAR("ssssssssssssss\n");
     #ifdef G0_FEEDRATE
       feedRate_t old_feedrate;
       #if ENABLED(VARIABLE_G0_FEEDRATE)
@@ -100,9 +100,9 @@ void GcodeSuite::G0_G1(
     #endif // FWRETRACT
 
     #if IS_SCARA
-      fast_move ? prepare_fast_move_to_destination() : prepare_move_to_destination();
+      fast_move ? prepare_fast_move_to_destination() : prepare_line_to_destination();
     #else
-      prepare_move_to_destination();
+      prepare_line_to_destination();
     #endif
 
     #ifdef G0_FEEDRATE

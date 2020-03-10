@@ -107,18 +107,18 @@
 // Temperature Sensors
 //
 #define TEMP_0_PIN          0   // Analog Input
-#define TEMP_1_PIN          2   // Analog Input
-#define TEMP_2_PIN          3   // Analog Input
-#define TEMP_3_PIN          4   // Analog Input
-#define TEMP_BED_PIN        1   // Analog Input
+//#define TEMP_1_PIN          2   // Analog Input
+////#define TEMP_2_PIN          3   // Analog Input
+//#define TEMP_3_PIN          4   // Analog Input
+//#define TEMP_BED_PIN        1   // Analog Input
 
 //
 // Heaters / Fans
 //
 #define HEATER_0_PIN        3
-#define HEATER_1_PIN        8
-#define HEATER_2_PIN        7
-#define HEATER_3_PIN        9
+#define HEATER_1_PIN        -1
+#define HEATER_2_PIN        -1
+#define HEATER_3_PIN        -1
 #define HEATER_BED_PIN      2
 
 #ifndef FAN_PIN
@@ -172,3 +172,5 @@
   #define BTN_ENC          64
 
 #endif // REPRAPWORLD_GRAPHICAL_LCD
+
+#define BEEPER_PIN      27

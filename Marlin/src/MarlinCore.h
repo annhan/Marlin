@@ -40,9 +40,17 @@ void stop();
 
 void idle(
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
-    bool no_stepper_sleep = false  // pass true to keep steppers from disabling on timeout
+    bool no_stepper_sleep=false    // Pass true to keep steppers from timing out
   #endif
 );
+
+inline void idle_no_sleep() {
+  idle(
+    #if ENABLED(ADVANCED_PAUSE_FEATURE)
+      true
+    #endif
+  );
+}
 
 #if ENABLED(EXPERIMENTAL_I2CBUS)
   #include "feature/twibus.h"
@@ -62,6 +70,8 @@ void enable_all_steppers();
 void disable_e_stepper(const uint8_t e);
 void disable_e_steppers();
 void disable_all_steppers();
+
+void report_pos_step();
 
 void kill(PGM_P const lcd_error=nullptr, PGM_P const lcd_component=nullptr, const bool steppers_off=false);
 void minkill(const bool steppers_off=false);
@@ -115,4 +125,6 @@ void protected_pin_err();
 #endif
 
 extern const char NUL_STR[], M112_KILL_STR[], G28_STR[], M21_STR[], M23_STR[], M24_STR[],
-                  SP_P_STR[], SP_T_STR[], SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_E_STR[];
+                  SP_P_STR[], SP_T_STR[], SP_X_STR[], SP_Y_STR[], SP_Z_STR[], SP_E_STR[],
+                  X_LBL[], Y_LBL[], Z_LBL[], E_LBL[], SP_X_LBL[], SP_Y_LBL[], SP_Z_LBL[], SP_E_LBL[];
+

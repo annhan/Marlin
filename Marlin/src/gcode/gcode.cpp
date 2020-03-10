@@ -135,7 +135,7 @@ void GcodeSuite::get_destination_from_command() {
 
   // Get new XYZ position, whether absolute or relative
   LOOP_XYZ(i) {
-    if ( (seen[i] = parser.seenval(axis_codes[i])) ) {
+    if ( (seen[i] = parser.seenval(XYZ_CHAR(i))) ) {
       const float v = parser.value_axis_units((AxisEnum)i);
       if (skip_move)
         destination[i] = current_position[i];
@@ -277,7 +277,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         case 27: G27(); break;                                    // G27: Nozzle Park
       #endif
 
-      case 28: G28(false); break;                                 // G28: Home all axes, one at a time
+      case 28: G28(); break;                                      // G28: Home one or more axes
 
       #if HAS_LEVELING
         case 29:                                                  // G29: Bed leveling calibration
@@ -359,6 +359,9 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
 
       default: parser.unknown_command_warning(); break;
     }
+	#if ENABLED(mWorkProtocol)
+		if (!no_ok) queue.ok_to_send();
+	#endif
     break;
 
     case 'M': switch (parser.codenum) {
@@ -785,7 +788,7 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
         #endif
       #endif
 
-      #if HAS_TRINAMIC
+      #if HAS_TRINAMIC_CONFIG
         case 122: M122(); break;                                  // M122: Report driver configuration and status
         case 906: M906(); break;                                  // M906: Set motor current in milliamps using axis codes X, Y, Z, E
         #if HAS_STEALTHCHOP
@@ -872,8 +875,12 @@ void GcodeSuite::process_parsed_command(const bool no_ok/*=false*/) {
       #endif
       parser.unknown_command_warning();
   }
-
+#if ENABLED(mWorkProtocol)
+#else
   if (!no_ok) queue.ok_to_send();
+#endif
+  
+ 
 }
 
 /**
@@ -951,7 +958,12 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
       switch (busy_state) {
         case IN_HANDLER:
         case IN_PROCESS:
-          SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
+		  #if ENABLED(mWorkProtocol)
+			SERIAL_CHAR("b ");
+			report_pos_step();
+		  #else
+			SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
+		  #endif
           break;
         case PAUSED_FOR_USER:
           SERIAL_ECHO_MSG(STR_BUSY_PAUSED_FOR_USER);
@@ -963,7 +975,11 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
           break;
       }
     }
-    next_busy_signal_ms = ms + host_keepalive_interval * 1000UL;
+	#if ENABLED(mWorkProtocol)
+		next_busy_signal_ms = ms + host_keepalive_interval * 200UL;
+	#else
+		next_busy_signal_ms = ms + host_keepalive_interval * 1000UL;
+	#endif
   }
 
 #endif // HOST_KEEPALIVE_FEATURE
