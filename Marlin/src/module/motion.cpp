@@ -831,7 +831,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     }*/
 	
 	SERIAL_CHAR("next_idle_ms\n");
-	millis_t next_idle_ms = millis() + 200UL;
+	/*millis_t next_idle_ms = millis() + 200UL;
 	while (--segments) {
 		
         
@@ -841,6 +841,17 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
           next_idle_ms = millis() + 200UL;
           idle();
         }
+        raw += segment_distance;
+        if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
+          #if ENABLED(SCARA_FEEDRATE_SCALING)
+            , inv_duration
+          #endif
+        ))
+          break;
+      }*/
+	        millis_t next_idle_ms = millis() + 200UL;
+      while (--segments) {
+        segment_idle(next_idle_ms);
         raw += segment_distance;
         if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
           #if ENABLED(SCARA_FEEDRATE_SCALING)
