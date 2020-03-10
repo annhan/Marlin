@@ -206,13 +206,13 @@ xyz_pos_t cartes;
 /**
  * Output the current position to serial
  */
-
+/*
 void report_current_position() {
   const xyz_pos_t lpos = current_position.asLogical();
   SERIAL_ECHOPAIR("X:", lpos.x, " Y:", lpos.y, " Z:", lpos.z, " E:", current_position.e);
 	SERIAL_CHAR(' ');
-
-
+}
+*/
 inline void report_more_positions() {
   stepper.report_positions();
   #if IS_SCARA
@@ -442,7 +442,9 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
   #elif IS_SCARA
 
-    if (!position_is_reachable(rx, ry)) return;
+    if (!position_is_reachable(rx, ry)){ 
+	SERIAL_CHAR("position_is_reachable\n");
+	return;}
 
     destination = current_position;
 
@@ -451,7 +453,7 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
       destination.z = rz;
       prepare_internal_fast_move_to_destination(z_feedrate);
     }
-
+	
     destination.set(rx, ry);
     prepare_internal_fast_move_to_destination(xy_feedrate);
 
@@ -726,7 +728,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
      * but may produce jagged lines. Try 0.5mm, 1.0mm, and 2.0mm
      * and compare the difference.
      */
-    #define SCARA_MIN_SEGMENT_LENGTH 0.5f
+    #define SCARA_MIN_SEGMENT_LENGTH 1.0f
   #endif
 
   /**
@@ -758,7 +760,14 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     }
 
     // Fail if attempting move outside printable radius
-    if (!position_is_reachable(destination)) return true;
+    if (!position_is_reachable(destination)) {
+		SERIAL_CHAR("outSIDE\n");
+		return true;
+		
+		}
+		else{
+			SERIAL_CHAR("Trong Outside\n");
+		}
 
     // Get the linear distance in XYZ
     float cartesian_mm = diff.magnitude();
@@ -767,7 +776,10 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     if (UNEAR_ZERO(cartesian_mm)) cartesian_mm = ABS(diff.e);
 
     // No E move either? Game over.
-    if (UNEAR_ZERO(cartesian_mm)) return true;
+    if (UNEAR_ZERO(cartesian_mm)) {SERIAL_CHAR("UNEAR_ZERO return\n");return true;}
+	else{
+			SERIAL_CHAR("UNEAR_ZERO Out\n");
+		}
 
     // Minimum number of seconds to move the given distance
     const float seconds = cartesian_mm / scaled_fr_mm_s;
@@ -793,7 +805,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
       const float inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
     #endif
 
-    /*
+    
     SERIAL_ECHOPAIR("mm=", cartesian_mm);
     SERIAL_ECHOPAIR(" seconds=", seconds);
     SERIAL_ECHOPAIR(" segments=", segments);
@@ -805,18 +817,39 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     xyze_pos_t raw = current_position;
 
     // Calculate and execute the segments
-    millis_t next_idle_ms = millis() + 200UL;
-    while (--segments) {
+    //millis_t next_idle_ms = millis() + 200UL;
+   /* while (--segments) {
       segment_idle(next_idle_ms);
       raw += segment_distance;
+	  SERIAL_CHAR("next_idle_ms\n");
       if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
         #if ENABLED(SCARA_FEEDRATE_SCALING)
           , inv_duration
         #endif
       ))
         break;
-    }
-
+    }*/
+	
+	SERIAL_CHAR("next_idle_ms\n");
+	millis_t next_idle_ms = millis() + 200UL;
+	while (--segments) {
+		
+        
+        //thermalManager.manage_heater();  // This returns immediately if not really needed.
+        if (ELAPSED(millis(), next_idle_ms)) {
+			SERIAL_CHAR("next_idle_ms\n");
+          next_idle_ms = millis() + 200UL;
+          idle();
+        }
+        raw += segment_distance;
+        if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
+          #if ENABLED(SCARA_FEEDRATE_SCALING)
+            , inv_duration
+          #endif
+        ))
+          break;
+      }
+ SERIAL_CHAR("next_idle_ms OUT\n");
     // Ensure last segment arrives at target location.
     planner.buffer_line(destination, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
       #if ENABLED(SCARA_FEEDRATE_SCALING)

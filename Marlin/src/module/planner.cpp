@@ -2389,7 +2389,11 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
     // Start with a safe speed (from which the machine may halt to stop immediately).
     float safe_speed = nominal_speed;
-
+    #ifdef TRAVEL_EXTRA_XYJERK
+      const float extra_xyjerk = (de <= 0) ? TRAVEL_EXTRA_XYJERK : 0;
+    #else
+      constexpr float extra_xyjerk = 0;
+    #endif
     uint8_t limited = 0;
     #if HAS_LINEAR_E_JERK
       LOOP_XYZ(i)

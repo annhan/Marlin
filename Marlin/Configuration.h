@@ -82,19 +82,19 @@
 //
 #if EITHER(MORGAN_SCARA, MP_SCARA)
   // If movement is choppy try lowering this value
-  #define SCARA_SEGMENTS_PER_SECOND 200
+  #define SCARA_SEGMENTS_PER_SECOND 100
   // Length of inner and outer support arms. Measure arm lengths precisely.
-  #define SCARA_LINKAGE_1  43    // (mm)
-  #define SCARA_LINKAGE_2  23    // (mm)
+  #define SCARA_LINKAGE_1  430    // (mm)
+  #define SCARA_LINKAGE_2  230    // (mm)
   // SCARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
-  #define SCARA_OFFSET_X    -20       // (mm)
+  #define SCARA_OFFSET_X    -50       // (mm)
   #define SCARA_OFFSET_Y    -50       // (mm)
   #if ENABLED(MORGAN_SCARA)
-    //#define DEBUG_SCARA_KINEMATICS
+    #define DEBUG_SCARA_KINEMATICS
     #define SCARA_FEEDRATE_SCALING  // Convert XY feedrate from mm/s to degrees/s on the fly
     // Radius around the center where the arm cannot reach
-    #define MIDDLE_DEAD_ZONE_R   0  // (mm)
+    #define MIDDLE_DEAD_ZONE_R   1  // (mm)
 
     #define THETA_HOMING_OFFSET  0  // Calculated from Calibration Guide and M360 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
     #define PSI_HOMING_OFFSET    0  // Calculated from Calibration Guide and M364 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
@@ -781,7 +781,7 @@
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
-  #define MAX_FEEDRATE_EDIT_VALUES    { 10, 10, 10, 50 } // ...or, set your own edit limits
+  #define MAX_FEEDRATE_EDIT_VALUES    { 3000, 3000, 3000, 50 } // ...or, set your own edit limits
 #endif
 
 /**
@@ -790,7 +790,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 5000, 5000, 500, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 500, 500, 500, 10000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -805,9 +805,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          300    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  300    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   300    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -1132,11 +1132,11 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 66
-#define Y_BED_SIZE 66
+#define X_BED_SIZE 660
+#define Y_BED_SIZE 660
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -66
+#define X_MIN_POS 0
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
@@ -1149,7 +1149,7 @@
  * - Prevent moves outside the set machine bounds.
  * - Individual axes can be disabled, if desired.
  * - X and Y only apply to Cartesian robots.
- * - Use 'M211' to set software endstops on/off or report current state
+ * - Use 'M211' to set software endstops on/off or report current statem
  */
 
 // Min software endstops constrain movement within minimum coordinate bounds
