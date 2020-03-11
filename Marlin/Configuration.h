@@ -77,24 +77,25 @@
 // QHARLEYS Autobedlevelling has not been ported, because Marlin has now Bed-levelling
 // You might need Z-Min endstop on SCARA-Printer to use this feature. Actually untested!
 // Uncomment to use Morgan scara mode
-
+//#define IS_SCARA 1
+//  #define IS_KINEMATIC 1
 #define MORGAN_SCARA
 //
 #if EITHER(MORGAN_SCARA, MP_SCARA)
   // If movement is choppy try lowering this value
-  #define SCARA_SEGMENTS_PER_SECOND 100
+  #define SCARA_SEGMENTS_PER_SECOND 150
   // Length of inner and outer support arms. Measure arm lengths precisely.
   #define SCARA_LINKAGE_1  430    // (mm)
   #define SCARA_LINKAGE_2  230    // (mm)
   // SCARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
-  #define SCARA_OFFSET_X    -50       // (mm)
-  #define SCARA_OFFSET_Y    -50       // (mm)
+  #define SCARA_OFFSET_X    0       // (mm)
+  #define SCARA_OFFSET_Y    0       // (mm)
   #if ENABLED(MORGAN_SCARA)
-    #define DEBUG_SCARA_KINEMATICS
+    //#define DEBUG_SCARA_KINEMATICS
     #define SCARA_FEEDRATE_SCALING  // Convert XY feedrate from mm/s to degrees/s on the fly
     // Radius around the center where the arm cannot reach
-    #define MIDDLE_DEAD_ZONE_R   1  // (mm)
+    #define MIDDLE_DEAD_ZONE_R   0  // (mm)
 
     #define THETA_HOMING_OFFSET  0  // Calculated from Calibration Guide and M360 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
     #define PSI_HOMING_OFFSET    0  // Calculated from Calibration Guide and M364 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
@@ -122,7 +123,7 @@
  */
 
 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
-#define SHOW_BOOTSCREEN
+//#define SHOW_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
 //#define SHOW_CUSTOM_BOOTSCREEN
@@ -767,7 +768,7 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define STEPS_PER_DEGREE (1.0 * 200 * 32 * 5 / 360.0)
+#define STEPS_PER_DEGREE (1.0 * 200 * 128 * 5 / 360.0)
 #define Z_STEPS_PER_MM   (1.0 * 200 * 32 * 5 / 15   ) //15 LÀ (1/3)/5
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {STEPS_PER_DEGREE, STEPS_PER_DEGREE, Z_STEPS_PER_MM,500}
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 4000, 500 }
@@ -777,7 +778,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 500, 500,500, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 15000, 15000,10000, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -790,7 +791,7 @@
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 500, 500, 500, 10000 }
+#define DEFAULT_MAX_ACCELERATION      { 200, 200, 800, 10000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -805,9 +806,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          300    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  300    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   300    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_ACCELERATION          1000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  1800    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   1800    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -819,9 +820,9 @@
  */
 #define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
-  #define DEFAULT_ZJERK 10.0
+  #define DEFAULT_XJERK 2.0
+  #define DEFAULT_YJERK 2.0
+  #define DEFAULT_ZJERK 2.0
 
   //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
 
@@ -831,7 +832,7 @@
   #endif
 #endif
 
-#define DEFAULT_EJERK    5.0  // May be used by Linear Advance
+#define DEFAULT_EJERK    1.0  // May be used by Linear Advance
 
 /**
  * Junction Deviation Factor
@@ -852,7 +853,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-//#define S_CURVE_ACCELERATION
+#define S_CURVE_ACCELERATION
 
 //===========================================================================
 //============================= Z Probe Options =============================
@@ -1125,22 +1126,22 @@
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
-#define X_HOME_DIR -1
+#define X_HOME_DIR 1
 #define Y_HOME_DIR -1
 #define Z_HOME_DIR -1
 
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 660
-#define Y_BED_SIZE 660
+#define X_BED_SIZE 400
+#define Y_BED_SIZE 400
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS 0
+#define X_MIN_POS -660
 #define Y_MIN_POS 0
 #define Z_MIN_POS 0
-#define X_MAX_POS X_BED_SIZE
-#define Y_MAX_POS Y_BED_SIZE
+#define X_MAX_POS 660
+#define Y_MAX_POS 660
 #define Z_MAX_POS 8000
 
 /*
@@ -1444,7 +1445,7 @@
  *    +-------------->X     +-------------->X     +-------------->Y
  *     XY_SKEW_FACTOR        XZ_SKEW_FACTOR        YZ_SKEW_FACTOR
  */
-//#define SKEW_CORRECTION
+#define SKEW_CORRECTION
 
 #if ENABLED(SKEW_CORRECTION)
   // Input all length measurements here:

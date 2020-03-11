@@ -105,37 +105,28 @@ void inverse_kinematics(const xyz_pos_t &raw) {
      * Maths and first version by QHARLEY.
      * Integrated into Marlin and slightly restructured by Joachim Cerny.
      */
-    float C2, S2, SK1, SK2, THETA, PSI;
+		float C2, S2, SK1, SK2, THETA, PSI;
 
-    // Translate SCARA to standard XY with scaling factor
-    const xy_pos_t spos = raw - scara_offset;
-
-    const float H2 = HYPOT2(spos.x, spos.y);
-    if (L1 == L2)
-      C2 = H2 / L1_2_2 - 1;
-    else
-      C2 = (H2 - (L1_2 + L2_2)) / (2.0f * L1 * L2);
-
-    S2 = SQRT(1.0f - sq(C2));
-
-    // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
-    SK1 = L1 + L2 * C2;
-
-    // Rotated Arm2 gives the distance from Arm1 to Arm2
-    SK2 = L2 * S2;
-
-    // Angle of Arm1 is the difference between Center-to-End angle and the Center-to-Elbow
-    THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
-
-    // Angle of Arm2
-    PSI = ATAN2(S2, C2);
-
-    delta.set(DEGREES(THETA), DEGREES(THETA + PSI), raw.z);
-
-    /*
-      DEBUG_POS("SCARA IK", raw);
-      DEBUG_POS("SCARA IK", delta);
-      SERIAL_ECHOLNPAIR("  SCARA (x,y) ", sx, ",", sy, " C2=", C2, " S2=", S2, " Theta=", THETA, " Phi=", PHI);
+		// Translate SCARA to standard XY with scaling factor
+		const xy_pos_t spos = raw - scara_offset;
+		const float H2 = HYPOT2(spos.x, spos.y);
+		if (L1 == L2)
+		  C2 = H2 / L1_2_2 - 1;
+		else
+		  C2 = (H2 - (L1_2 + L2_2)) / (2.0f * L1 * L2);
+		S2 = SQRT(1.0f - sq(C2));
+		SK1 = L1 + L2 * C2;
+		SK2 = L2 * S2;
+		THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
+		PSI = ATAN2(S2, C2);
+    int doX=DEGREES(THETA);
+    int doY=DEGREES(THETA + PSI);
+		delta.set(DEGREES(THETA), DEGREES(THETA + PSI), raw.z);
+    
+   /* SERIAL_ECHOPAIR("SCARA ", doX);
+     SERIAL_ECHOPAIR(":", doY);
+    SERIAL_CHAR("\n");*/
+    //  SERIAL_ECHOLNPAIR("  SCARA (x,y) ", spos.x, ",", spos.y, " C2=", C2, " S2=", S2, " Theta=", THETA, " Phi=", PHI);
     //*/
 
   #else // MP_SCARA
