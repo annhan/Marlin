@@ -105,11 +105,13 @@ void inverse_kinematics(const xyz_pos_t &raw) {
      * Maths and first version by QHARLEY.
      * Integrated into Marlin and slightly restructured by Joachim Cerny.
      */
-		float C2, S2, SK1, SK2, THETA, PSI;
+		/*
+    */
+	float C2, S2, SK1, SK2, THETA, PSI;
+	const xy_pos_t spos = raw - scara_offset;
+	const float H2 = HYPOT2(spos.x, spos.y);
 
 		// Translate SCARA to standard XY with scaling factor
-		const xy_pos_t spos = raw - scara_offset;
-		const float H2 = HYPOT2(spos.x, spos.y);
 		if (L1 == L2)
 		  C2 = H2 / L1_2_2 - 1;
 		else
@@ -119,10 +121,10 @@ void inverse_kinematics(const xyz_pos_t &raw) {
 		SK2 = L2 * S2;
 		THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
 		PSI = ATAN2(S2, C2);
-    int doX=DEGREES(THETA);
-    int doY=DEGREES(THETA + PSI);
+  //  int doX=DEGREES(THETA);
+  //  int doY=DEGREES(THETA + PSI);
 		delta.set(DEGREES(THETA), DEGREES(THETA + PSI), raw.z);
-    
+	//#endif
    /* SERIAL_ECHOPAIR("SCARA ", doX);
      SERIAL_ECHOPAIR(":", doY);
     SERIAL_CHAR("\n");*/

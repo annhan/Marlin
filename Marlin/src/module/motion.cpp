@@ -712,7 +712,7 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     next_idle_ms = ms + 200UL;
     return idle();
   }
-  thermalManager.manage_heater();  // Returns immediately on most calls
+  //thermalManager.manage_heater();  // Returns immediately on most calls
 }
 
 #if IS_KINEMATIC
@@ -801,12 +801,12 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     NOLESS(segments, 1U);
 
     // The approximate length of each segment
-    const float inv_segments = 1.0f / float(segments),
+    const double   inv_segments = 1.0f / double(segments),
                 cartesian_segment_mm = cartesian_mm * inv_segments;
-    const xyze_float_t segment_distance = diff * inv_segments;
+    const xyze_float_t segment_distance = diff * float(inv_segments);
 
     #if ENABLED(SCARA_FEEDRATE_SCALING)
-      const float inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
+      const double   inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
     #endif
 
     
@@ -820,61 +820,36 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     // Get the current position as starting point
     xyze_pos_t raw = current_position;
 
-    // Calculate and execute the segments
-    //millis_t next_idle_ms = millis() + 200UL;
-   /* while (--segments) {
-      segment_idle(next_idle_ms);
-      raw += segment_distance;
-	  SERIAL_CHAR("next_idle_ms\n");
-      if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
-        #if ENABLED(SCARA_FEEDRATE_SCALING)
-          , inv_duration
-        #endif
-      ))
-        break;
-    }*/
-	
-	//SERIAL_CHAR("next_idle_ms\n");
-	/*millis_t next_idle_ms = millis() + 200UL;
-	while (--segments) {
-		
-        
-        //thermalManager.manage_heater();  // This returns immediately if not really needed.
-        if (ELAPSED(millis(), next_idle_ms)) {
-			SERIAL_CHAR("next_idle_ms\n");
-          next_idle_ms = millis() + 200UL;
-          idle();
-        }
-        raw += segment_distance;
-        if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
-          #if ENABLED(SCARA_FEEDRATE_SCALING)
-            , inv_duration
-          #endif
-        ))
-          break;
-      }*/
-	  static millis_t next_idle_ms = millis() + 200UL;
+    
+    static millis_t next_idle_ms = millis() + 200UL;
+    raw += segment_distance;
+    planner.buffer_line(raw, scaled_fr_mm_s/2, active_extruder, 0.0
+      #if ENABLED(SCARA_FEEDRATE_SCALING)
+        , inv_duration
+      #endif
+    );
+    segments = segments- 1;
     while (--segments) {
-
+      SERIAL_ECHOPAIR("p", raw.x);
+      SERIAL_ECHOPAIR(":", raw.y);
+      SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
+		  SERIAL_CHAR("\n");
       segment_idle(next_idle_ms);
-     /* thermalManager.manage_heater();  // This returns immediately if not really needed.
-      if (ELAPSED(millis(), next_idle_ms)) {
-        next_idle_ms = millis() + 200UL;
-        idle();
-      }*/
-
       raw += segment_distance;
-
-      if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
+      if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, 0.0
         #if ENABLED(SCARA_FEEDRATE_SCALING)
           , inv_duration
         #endif
       ))
         break;
+
     }
 // SERIAL_CHAR("next_idle_ms OUT\n");
     // Ensure last segment arrives at target location.
-    planner.buffer_line(destination, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
+    SERIAL_ECHOPAIR("finish=", destination.x);
+    SERIAL_ECHOPAIR(":", destination.y);
+		SERIAL_CHAR("\n");
+    planner.buffer_line(destination, scaled_fr_mm_s/2, active_extruder, cartesian_segment_mm
       #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
       #endif
