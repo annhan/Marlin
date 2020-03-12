@@ -853,15 +853,15 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
         ))
           break;
       }*/
-	  static millis_t next_idle_ms = millis() + 100UL;
+	  static millis_t next_idle_ms = millis() + 200UL;
     while (--segments) {
 
-      
-      thermalManager.manage_heater();  // This returns immediately if not really needed.
+      segment_idle(next_idle_ms);
+     /* thermalManager.manage_heater();  // This returns immediately if not really needed.
       if (ELAPSED(millis(), next_idle_ms)) {
-        next_idle_ms = millis() + 100UL;
+        next_idle_ms = millis() + 200UL;
         idle();
-      }
+      }*/
 
       raw += segment_distance;
 
