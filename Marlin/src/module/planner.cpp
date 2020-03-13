@@ -2702,9 +2702,14 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
         float x_tam =   planner.get_axis_position_degrees(A_AXIS);
         float y_tam=    planner.get_axis_position_degrees(B_AXIS);
        delta.set(x_tam + machine.x, y_tam + machine.y, machine.z);
+       forward_kinematics_SCARA(x_tam + machine.x,y_tam + machine.y);
+       destination.x=cartes.x;
+       destination.y=cartes.y;
         #if ENABLED(mWorkDEBUGProtocol)
           SERIAL_ECHOPAIR("XTAM:", x_tam );
           SERIAL_ECHOPAIR(" XMACHI:", machine.x);
+          SERIAL_ECHOPAIR(" yTAM:", y_tam );
+          SERIAL_ECHOPAIR(" yMACHI:", machine.y);
           SERIAL_ECHOPAIR(" X:", x_tam + machine.x);
           SERIAL_ECHOPAIR(" Y:", y_tam + machine.y);
           SERIAL_CHAR(" Jog Mode nhan\n");
