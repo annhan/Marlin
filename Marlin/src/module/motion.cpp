@@ -215,9 +215,9 @@ void report_current_position() {
 */
 inline void report_more_positions() {
   stepper.report_positions();
-  #if IS_SCARA
+ /* #if IS_SCARA
     scara_report_positions();
-  #endif
+  #endif*/
 }
 void report_current_position_mWork(){
   const xyz_pos_t lpos = current_position.asLogical();
@@ -260,7 +260,7 @@ void report_current_position() { report_logical_position(current_position); }
  */
 void report_current_position_projected() {
   report_logical_position(current_position);
-  stepper.report_a_position(planner.position);
+ // stepper.report_a_position(planner.position);
 }
 
 
@@ -714,7 +714,14 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
   }
   //thermalManager.manage_heater();  // Returns immediately on most calls
 }
-
+FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
+  const millis_t ms = millis();
+  if (ELAPSED(ms, next_idle_ms)) {
+    next_idle_ms = ms + 200UL;
+    return idle();
+  }
+  //thermalManager.manage_heater();  // Returns immediately on most calls
+}
 #if IS_KINEMATIC
 
   #if IS_SCARA
@@ -808,13 +815,13 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
     #if ENABLED(SCARA_FEEDRATE_SCALING)
       const double   inv_duration = scaled_fr_mm_s / cartesian_segment_mm;
     #endif
-
-    
-    SERIAL_ECHOPAIR("mm=", cartesian_mm);
-    SERIAL_ECHOPAIR(" seconds=", seconds);
-    SERIAL_ECHOPAIR(" segments=", segments);
-    SERIAL_ECHOPAIR(" segment_mm=", cartesian_segment_mm);
-    SERIAL_EOL();
+    #if ENABLED(mWorkDEBUGProtocol)
+      SERIAL_ECHOPAIR("mm=", cartesian_mm);
+      SERIAL_ECHOPAIR(" seconds=", seconds);
+      SERIAL_ECHOPAIR(" segments=", segments);
+      SERIAL_ECHOPAIR(" segment_mm=", cartesian_segment_mm);
+      SERIAL_EOL();
+    #endif
     //*/
 
     // Get the current position as starting point
@@ -822,42 +829,55 @@ FORCE_INLINE void segment_idle(millis_t &next_idle_ms) {
 
     
     static millis_t next_idle_ms = millis() + 200UL;
+    float feedrate_mwork = MMS_SCALED(feedrate_mm_s);
+    float mWorkTimeDelaySegment = cartesian_segment_mm;
+    if ((raw.x == 0) ||(raw.y ==0)){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
     raw += segment_distance;
-    planner.buffer_line(raw, scaled_fr_mm_s/2, active_extruder, 0.0
-      #if ENABLED(SCARA_FEEDRATE_SCALING)
+    planner.buffer_line(raw,  feedrate_mwork, active_extruder, cartesian_segment_mm
+        #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
-      #endif
+        #endif
     );
     segments = segments- 1;
-    while (--segments) {
+    if (segments>1){
+      while (--segments) {
+        #if ENABLED(mWorkDEBUGProtocol)
+          SERIAL_ECHOPAIR("p", raw.x);
+          SERIAL_ECHOPAIR(":", raw.y);
+          SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
+          SERIAL_CHAR("\n");
+        #endif
+        segment_idle(next_idle_ms);
+        raw += segment_distance;
+        
+        if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
+          #if ENABLED(SCARA_FEEDRATE_SCALING)
+            , inv_duration
+          #endif
+        ))
+          break;
+        
+      }
+    }
+    #if ENABLED(mWorkDEBUGProtocol)
       SERIAL_ECHOPAIR("p", raw.x);
       SERIAL_ECHOPAIR(":", raw.y);
       SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
-		  SERIAL_CHAR("\n");
-      segment_idle(next_idle_ms);
-      raw += segment_distance;
-      if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, 0.0
-        #if ENABLED(SCARA_FEEDRATE_SCALING)
-          , inv_duration
-        #endif
-      ))
-        break;
-
-    }
-// SERIAL_CHAR("next_idle_ms OUT\n");
-    // Ensure last segment arrives at target location.
-    SERIAL_ECHOPAIR("finish=", destination.x);
-    SERIAL_ECHOPAIR(":", destination.y);
-		SERIAL_CHAR("\n");
-    planner.buffer_line(destination, scaled_fr_mm_s/2, active_extruder, cartesian_segment_mm
+      SERIAL_CHAR("\n");
+      SERIAL_ECHOPAIR("finish=", destination.x);
+      SERIAL_ECHOPAIR(":", destination.y);
+      SERIAL_CHAR("\n");
+    #endif
+    feedrate_mwork = MMS_SCALED(feedrate_mm_s);
+    mWorkTimeDelaySegment = cartesian_segment_mm;
+    if ((destination.x == 0) ||(destination.y ==0) ){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
+    planner.buffer_line(destination, feedrate_mwork, active_extruder, cartesian_segment_mm
       #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
       #endif
     );
-
     return false; // caller will update current_position
   }
-
 #else // !IS_KINEMATIC
 	//SERIAL_CHAR("!IS_KINEMATIC\n");
   #if ENABLED(SEGMENT_LEVELED_MOVES)

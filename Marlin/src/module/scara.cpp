@@ -110,27 +110,23 @@ void inverse_kinematics(const xyz_pos_t &raw) {
 	float C2, S2, SK1, SK2, THETA, PSI;
 	const xy_pos_t spos = raw - scara_offset;
 	const float H2 = HYPOT2(spos.x, spos.y);
-
-		// Translate SCARA to standard XY with scaling factor
-		if (L1 == L2)
+	if (L1 == L2)
 		  C2 = H2 / L1_2_2 - 1;
-		else
+	else
 		  C2 = (H2 - (L1_2 + L2_2)) / (2.0f * L1 * L2);
-		S2 = SQRT(1.0f - sq(C2));
-		SK1 = L1 + L2 * C2;
-		SK2 = L2 * S2;
-		THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
-		PSI = ATAN2(S2, C2);
-  //  int doX=DEGREES(THETA);
-  //  int doY=DEGREES(THETA + PSI);
-		delta.set(DEGREES(THETA), DEGREES(THETA + PSI), raw.z);
-	//#endif
-   /* SERIAL_ECHOPAIR("SCARA ", doX);
-     SERIAL_ECHOPAIR(":", doY);
-    SERIAL_CHAR("\n");*/
-    //  SERIAL_ECHOLNPAIR("  SCARA (x,y) ", spos.x, ",", spos.y, " C2=", C2, " S2=", S2, " Theta=", THETA, " Phi=", PHI);
-    //*/
-
+  S2 = SQRT(1.0f - sq(C2));
+	SK1 = L1 + L2 * C2;
+	SK2 = L2 * S2;
+	THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
+	PSI = ATAN2(S2, C2);
+  double doX=DEGREES(THETA);
+  double doY=DEGREES(PSI);
+	delta.set(doX, doY + doX, raw.z);
+    #if ENABLED(mWorkDEBUGProtocol)
+        SERIAL_ECHOPAIR("SCARA ", doX);
+        SERIAL_ECHOPAIR(":", doY);
+        SERIAL_CHAR("\n");
+    #endif //mWorkDEBUGProtocol
   #else // MP_SCARA
 
     const float x = raw.x, y = raw.y, c = HYPOT(x, y),

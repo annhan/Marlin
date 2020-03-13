@@ -110,7 +110,7 @@
 
 // Delay for delivery of first block to the stepper ISR, if the queue contains 2 or
 // fewer movements. The delay is measured in milliseconds, and must be less than 250ms
-#define BLOCK_DELAY_FOR_1ST_MOVE 100
+#define BLOCK_DELAY_FOR_1ST_MOVE 250
 
 Planner planner;
 
@@ -2747,8 +2747,14 @@ void Planner::set_machine_position_mm(const float &a, const float &b, const floa
     //previous_speed.reset();
     buffer_sync_block();
   }
-  else
+  else {
+    #if ENABLED(mWorkDEBUGProtocol)
+      previous_nominal_speed_sqr = 0.0; // Reset planner junction speeds. Assume start from rest.
+      previous_speed.reset();
+    #endif
     stepper.set_position(position);
+  }
+    
 }
 
 void Planner::set_position_mm(const float &rx, const float &ry, const float &rz, const float &e) {
