@@ -109,18 +109,30 @@ void inverse_kinematics(const xyz_pos_t &raw) {
     */
 	float C2, S2, SK1, SK2, THETA, PSI;
 	const xy_pos_t spos = raw - scara_offset;
-	const float H2 = HYPOT2(spos.x, spos.y);
-	if (L1 == L2)
-		  C2 = H2 / L1_2_2 - 1;
-	else
-		  C2 = (H2 - (L1_2 + L2_2)) / (2.0f * L1 * L2);
-  S2 = SQRT(1.0f - sq(C2));
-	SK1 = L1 + L2 * C2;
-	SK2 = L2 * S2;
-	THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
-	PSI = ATAN2(S2, C2);
+      #if ENABLED(mWorkDEBUGProtocol)
+        SERIAL_ECHOPAIR("SCARA ", spos.x);
+        SERIAL_ECHOPAIR(":", spos.y);
+        SERIAL_CHAR("\n");
+    #endif //mWorkDEBUGProtocol
+  if ((raw.x >0)&&(raw.y<0)){
+    const float H2 = HYPOT2(spos.x, spos.y);
+    float E = -1 *acos((H2 - L1_2 - L2_2) / (2*L1*L2));
+    float Q= -1 *(acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
+    float S = atan2(spos.y,spos.x) - Q;
+    THETA = S;
+    PSI = E;
+  }
+  else{
+    const float H2 = HYPOT2(spos.x, spos.y);
+    float E = acos((H2 - L1_2 - L2_2) / (2*L1*L2));
+    float Q= (acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
+    float S = atan2(spos.y,spos.x) - Q;
+    THETA = S;
+    PSI = E;
+  }
   double doX=DEGREES(THETA);
   double doY=DEGREES(PSI);
+  
 	delta.set(doX, doY + doX, raw.z);
     #if ENABLED(mWorkDEBUGProtocol)
         SERIAL_ECHOPAIR("SCARA ", doX);

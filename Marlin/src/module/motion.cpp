@@ -352,8 +352,7 @@ void line_to_current_position(const feedRate_t &fr_mm_s/*=feedrate_mm_s*/) {
       // UBL segmented line will do Z-only moves in single segment
       ubl.line_to_destination_segmented(scaled_fr_mm_s);
     #else
-      if (current_position == destination) return;
-
+      if (!gcode.axis_relative){if (current_position == destination) return;}
       planner.buffer_line(destination, scaled_fr_mm_s, active_extruder);
     #endif
 

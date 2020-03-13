@@ -140,10 +140,20 @@ void GcodeSuite::get_destination_from_command() {
       if (skip_move)
         destination[i] = current_position[i];
       else
-        destination[i] = axis_is_relative(AxisEnum(i)) ? current_position[i] + v : LOGICAL_TO_NATIVE(v, i);
+        #if ENABLED(mWorkDEBUGProtocol)
+          SERIAL_CHAR(" axis_is_relative\n");
+          destination[i] = axis_is_relative(AxisEnum(i)) ? v : LOGICAL_TO_NATIVE(v, i); 
+        #else
+          destination[i] = axis_is_relative(AxisEnum(i)) ? current_position[i] + v : LOGICAL_TO_NATIVE(v, i); 
+        #endif
     }
     else
-      destination[i] = current_position[i];
+        #if ENABLED(mWorkDEBUGProtocol)
+          destination[i] = axis_is_relative(AxisEnum(i)) ? 0 : current_position[i];
+        #else
+          destination[i] = current_position[i];
+        #endif
+      
   }
 
   // Get new E position, whether absolute or relative

@@ -69,7 +69,7 @@
 #include "../lcd/ultralcd.h"
 #include "../core/language.h"
 #include "../gcode/parser.h"
-
+#include "../gcode/gcode.h"
 #include "../MarlinCore.h"
 
 #if HAS_LEVELING
@@ -2680,7 +2680,8 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
   #if HAS_POSITION_MODIFIERS
     apply_modifiers(machine);
   #endif
-
+ // return buffer_segment(machine, fr_mm_s, extruder, millimeters);
+ 
   #if IS_KINEMATIC
 
     #if DISABLED(CLASSIC_JERK)
@@ -2697,7 +2698,22 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
       mm = (delta_mm_cart.x != 0.0 || delta_mm_cart.y != 0.0) ? delta_mm_cart.magnitude() : ABS(delta_mm_cart.z);
 
     // Cartesian XYZ to kinematic ABC, stored in global 'delta'
-    inverse_kinematics(machine);
+    if (gcode.axis_relative){
+        float x_tam =   planner.get_axis_position_degrees(A_AXIS);
+        float y_tam=    planner.get_axis_position_degrees(B_AXIS);
+       delta.set(x_tam + machine.x, y_tam + machine.y, machine.z);
+        #if ENABLED(mWorkDEBUGProtocol)
+          SERIAL_ECHOPAIR("XTAM:", x_tam );
+          SERIAL_ECHOPAIR(" XMACHI:", machine.x);
+          SERIAL_ECHOPAIR(" X:", x_tam + machine.x);
+          SERIAL_ECHOPAIR(" Y:", y_tam + machine.y);
+          SERIAL_CHAR(" Jog Mode nhan\n");
+        #endif
+    }
+    else{
+      inverse_kinematics(machine);
+    }
+    
 
     #if ENABLED(SCARA_FEEDRATE_SCALING)
       // For SCARA scale the feed rate from mm/s to degrees/s
@@ -2769,6 +2785,9 @@ void Planner::set_position_mm(const float &rx, const float &ry, const float &rz,
   }
   #endif
   #if IS_KINEMATIC
+    #if ENABLED(mWorkDEBUGProtocol)
+      SERIAL_CHAR("IS KINEMATIC SCARA\n");
+    #endif
     position_cart.set(rx, ry, rz, e);
     inverse_kinematics(machine);
     set_machine_position_mm(delta.a, delta.b, delta.c, machine.e);
