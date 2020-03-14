@@ -2701,8 +2701,9 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
     if (gcode.axis_relative){
         float x_tam =   planner.get_axis_position_degrees(A_AXIS);
         float y_tam=    planner.get_axis_position_degrees(B_AXIS);
-       delta.set(x_tam + machine.x, y_tam + machine.y, machine.z);
-       forward_kinematics_SCARA(x_tam + machine.x,y_tam + machine.y);
+        
+       delta.set(x_tam + mWorkJogDestination.x, y_tam + mWorkJogDestination.y, machine.z);
+       forward_kinematics_SCARA(x_tam + mWorkJogDestination.x,y_tam + mWorkJogDestination.y);
        destination.x=cartes.x;
        destination.y=cartes.y;
         #if ENABLED(mWorkDEBUGProtocol)

@@ -140,22 +140,30 @@ void GcodeSuite::get_destination_from_command() {
       if (skip_move)
         destination[i] = current_position[i];
       else
-        #if ENABLED(mWorkDEBUGProtocol)
-          SERIAL_CHAR(" axis_is_relative\n");
-          destination[i] = axis_is_relative(AxisEnum(i)) ? v : LOGICAL_TO_NATIVE(v, i); 
+        #if ENABLED(mWorkProtocol)
+          #if ENABLED(mWorkDEBUGProtocol)
+            SERIAL_CHAR(" axis_is_relative\n");
+          #endif       
+          if (axis_is_relative(AxisEnum(i))){           
+              mWorkJogDestination[i] = v; 
+              destination[i] = (i<2) ? current_position[i]: current_position[i] + v;          
+          }
+          else destination[i] = LOGICAL_TO_NATIVE(v, i);    
         #else
           destination[i] = axis_is_relative(AxisEnum(i)) ? current_position[i] + v : LOGICAL_TO_NATIVE(v, i); 
         #endif
     }
-    else
-        #if ENABLED(mWorkDEBUGProtocol)
-          destination[i] = axis_is_relative(AxisEnum(i)) ? 0 : current_position[i];
+    else {
+        #if ENABLED(mWorkProtocol)
+          if (axis_is_relative(AxisEnum(i))){
+            mWorkJogDestination[i] = 0;
+          }
+          destination[i] = current_position[i];
         #else
           destination[i] = current_position[i];
         #endif
-      
+    }
   }
-
   // Get new E position, whether absolute or relative
   if ( (seen.e = parser.seenval('E')) ) {
     const float v = parser.value_axis_units(E_AXIS);

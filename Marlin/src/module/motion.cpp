@@ -108,6 +108,12 @@ xyze_pos_t current_position = { X_HOME_POS, Y_HOME_POS, Z_HOME_POS };
  *   G-codes can set destination using 'get_destination_from_command'
  */
 xyze_pos_t destination; // {0}
+/**
+ * Cartesian Jog Step
+ */
+#if ENABLED(mWorkProtocol)
+		xyze_pos_t mWorkJogDestination; // {0}
+#endif
 
 // G60/G61 Position Save and Return
 #if SAVED_POSITIONS

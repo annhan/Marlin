@@ -59,7 +59,8 @@ constexpr float fslop = 0.0001;
 extern bool relative_mode;
 
 extern xyze_pos_t current_position,  // High-level current tool position
-                  destination;       // Destination for a move
+                  destination,       // Destination for a move
+                  mWorkJogDestination; //Jog Step Scara
 
 // G60/G61 Position Save and Return
 #if SAVED_POSITIONS
