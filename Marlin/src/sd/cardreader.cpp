@@ -35,11 +35,11 @@
 #include "../module/configuration_store.h"
 
 #if ENABLED(EMERGENCY_PARSER)
-  #include "../feature/emergency_parser.h"
+  #include "../feature/e_parser.h"
 #endif
 
 #if ENABLED(POWER_LOSS_RECOVERY)
-  #include "../feature/power_loss_recovery.h"
+  #include "../feature/powerloss.h"
 #endif
 
 #if ENABLED(ADVANCED_PAUSE_FEATURE)
@@ -370,7 +370,7 @@ void CardReader::mount() {
   else {
     flag.mounted = true;
     SERIAL_ECHO_MSG(STR_SD_CARD_OK);
-    #if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
+    #if ENABLED(SDCARD_EEPROM_EMULATION)
       settings.first_load();
     #endif
   }
@@ -451,10 +451,12 @@ void openFailed(const char * const fname) {
 
 void announceOpen(const uint8_t doing, const char * const path) {
   if (doing) {
+    PORT_REDIRECT(SERIAL_BOTH);
     SERIAL_ECHO_START();
     SERIAL_ECHOPGM("Now ");
     serialprintPGM(doing == 1 ? PSTR("doing") : PSTR("fresh"));
     SERIAL_ECHOLNPAIR(" file: ", path);
+    PORT_RESTORE();
   }
 }
 
@@ -511,8 +513,11 @@ void CardReader::openFileRead(char * const path, const uint8_t subcall_type/*=0*
   if (file.open(curDir, fname, O_READ)) {
     filesize = file.fileSize();
     sdpos = 0;
+
+    PORT_REDIRECT(SERIAL_BOTH);
     SERIAL_ECHOLNPAIR(STR_SD_FILE_OPENED, fname, STR_SD_SIZE, filesize);
     SERIAL_ECHOLNPGM(STR_SD_FILE_SELECTED);
+    PORT_RESTORE();
 
     selectFileByName(fname);
     ui.set_status(longFilename[0] ? longFilename : fname);
@@ -617,7 +622,7 @@ void CardReader::checkautostart() {
   if (autostart_index < 0 || flag.sdprinting) return;
 
   if (!isMounted()) mount();
-  #if ENABLED(EEPROM_SETTINGS) && NONE(FLASH_EEPROM_EMULATION, SPI_EEPROM, I2C_EEPROM)
+  #if ENABLED(SDCARD_EEPROM_EMULATION)
     else settings.first_load();
   #endif
 

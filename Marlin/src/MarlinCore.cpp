@@ -78,7 +78,7 @@
 #endif
 
 #if ENABLED(MAX7219_DEBUG)
-  #include "feature/Max7219_Debug_LEDs.h"
+  #include "feature/max7219.h"
 #endif
 
 #if HAS_COLOR_LEDS
@@ -107,7 +107,7 @@
 #endif
 
 #if ENABLED(I2C_POSITION_ENCODERS)
-  #include "feature/I2CPositionEncoder.h"
+  #include "feature/encoder_i2c.h"
 #endif
 
 #if HAS_TRINAMIC_CONFIG && DISABLED(PSU_DEFAULT_OFF)
@@ -142,7 +142,7 @@
 #endif
 
 #if ENABLED(POWER_LOSS_RECOVERY)
-  #include "feature/power_loss_recovery.h"
+  #include "feature/powerloss.h"
 #endif
 
 #if ENABLED(CANCEL_OBJECTS)
@@ -174,7 +174,7 @@
 #endif
 
 #if ENABLED(PRUSA_MMU2)
-  #include "feature/prusa_MMU2/mmu2.h"
+  #include "feature/mmu2/mmu2.h"
 #endif
 
 #if HAS_L64XX
@@ -422,35 +422,30 @@ void startOrResumeJob() {
   #endif
 
   inline void finishSDPrinting() {
+
     bool did_state = true;
     switch (card.sdprinting_done_state) {
-
-
-      #if ENABLED(PRINTER_EVENT_LEDS)
-        case 1:
-          printerEventLEDs.onPrintCompleted();  // Change LED color for Print Completed
-          break;
-      #endif
-
-      #if HAS_RESUME_CONTINUE                   // Display "Click to Continue..."
-        case 2:
-          did_state = queue.enqueue_P(PSTR("M0 S"
-            #if HAS_LCD_MENU
-              "1800"                            // ...for 30 minutes with LCD
-            #else
-              "60"                              // ...for 1 minute with no LCD
-            #endif
-          ));
-
-          break;
-      #endif
-
-      case 3: print_job_timer.stop(); break;
-
-      case 4:
-        did_state = print_job_timer.duration() < 60 || queue.enqueue_P(PSTR("M31"));
+      case 1:
+        did_state = print_job_timer.duration() < 60 || queue.enqueue_one_P(PSTR("M31"));
         break;
 
+      case 2:
+        did_state = queue.enqueue_one_P(PSTR("M77"));
+        break;
+
+      case 3:
+        #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
+          ui.set_progress_done();
+        #endif
+        break;
+
+      case 4:                                   // Display "Click to Continue..."
+        #if HAS_RESUME_CONTINUE                 // 30 min timeout with LCD, 1 min without
+          did_state = queue.enqueue_one_P(
+            print_job_timer.duration() < 60 ? PSTR("M0Q1P1") : PSTR("M0Q1S" TERN(HAS_LCD_MENU, "1800", "60"))
+          );
+        #endif
+        break;
       case 5:
         #if ENABLED(POWER_LOSS_RECOVERY)
           recovery.purge();
@@ -458,10 +453,6 @@ void startOrResumeJob() {
 
         #if ENABLED(SD_FINISHED_STEPPERRELEASE) && defined(SD_FINISHED_RELEASECOMMAND)
           planner.finish_and_disable();
-        #endif
-
-        #if ENABLED(LCD_SET_PROGRESS_MANUALLY)
-          ui.set_progress_done();
         #endif
 
         #if ENABLED(SD_REPRINT_LAST_SELECTED_FILE)

@@ -35,6 +35,10 @@
   #include "../../../lcd/ultralcd.h"
 #endif
 
+
+#if ENABLED(POWER_LOSS_RECOVERY)
+  #include "../../../feature/powerloss.h"
+#endif
 /**
  * M125: Store current position and move to parking position.
  *       Called on pause (by M25) to prevent material leaking onto the
