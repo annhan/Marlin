@@ -104,13 +104,13 @@ void jogStepScara(const xyz_pos_t &raw){
   destination.x=cartes.x;
   destination.y=cartes.y;
   #if ENABLED(mWorkDEBUGProtocol)
-    SERIAL_ECHOPAIR("XTAM:", x_tam );
-    SERIAL_ECHOPAIR(" XMACHI:", raw.x);
-    SERIAL_ECHOPAIR(" yTAM:", y_tam );
-    SERIAL_ECHOPAIR(" yMACHI:", raw.y);
-    SERIAL_ECHOPAIR(" X:", x_tam + raw.x);
-    SERIAL_ECHOPAIR(" Y:", y_tam + raw.y);
-    SERIAL_CHAR(" Jog Mode nhan\n");
+    SERIAL_ECHOPAIR("XPOS:", x_tam );
+    SERIAL_ECHOPAIR(" XSTEP:", raw.x);
+    SERIAL_ECHOPAIR(" XNEW:", x_tam + raw.x);
+    SERIAL_ECHOPAIR(" YPOS:", y_tam );
+    SERIAL_ECHOPAIR(" YSTEP:", raw.y);
+    SERIAL_ECHOPAIR(" YNEW:", y_tam + raw.y);
+    SERIAL_CHAR("\n");
  #endif
 }
 #endif
