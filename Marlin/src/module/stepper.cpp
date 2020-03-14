@@ -2450,8 +2450,8 @@ int32_t Stepper::triggered_position(const AxisEnum axis) {
 
 void Stepper::report_a_position(const xyz_long_t &pos) {
   #if ENABLED(mWorkProtocol)
-        #if CORE_IS_XY || CORE_IS_XZ || ENABLED(DELTA) || IS_SCARA
-          SERIAL_ECHOPAIR(" C A:", pos.x, " B:", pos.y);
+        #if CORE_IS_XY || CORE_IS_XZ || ENABLED(DELTA) || IS_SCARA 
+          SERIAL_ECHOPAIR(" C A:", planner.get_axis_position_degrees(A_AXIS), " B:", planner.get_axis_position_degrees(B_AXIS));
         #else
           SERIAL_ECHOPAIR_P(PSTR(STR_COUNT_X), pos.x, SP_Y_LBL, pos.y);
         #endif
