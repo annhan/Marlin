@@ -40,3 +40,6 @@ void inverse_kinematics(const xyz_pos_t &raw);
 void forward_kinematics_SCARA(const float &a, const float &b);
 
 void scara_report_positions();
+#if ENABLED(mWorkProtocol)
+    void jogStepScara(const xyz_pos_t &raw);
+#endif

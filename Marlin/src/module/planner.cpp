@@ -2699,21 +2699,11 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
 
     // Cartesian XYZ to kinematic ABC, stored in global 'delta'
     if (gcode.axis_relative){
-        float x_tam =   planner.get_axis_position_degrees(A_AXIS);
-        float y_tam=    planner.get_axis_position_degrees(B_AXIS);
-        
-       delta.set(x_tam + mWorkJogDestination.x, y_tam + mWorkJogDestination.y, machine.z);
-       forward_kinematics_SCARA(x_tam + mWorkJogDestination.x,y_tam + mWorkJogDestination.y);
-       destination.x=cartes.x;
-       destination.y=cartes.y;
-        #if ENABLED(mWorkDEBUGProtocol)
-          SERIAL_ECHOPAIR("XTAM:", x_tam );
-          SERIAL_ECHOPAIR(" XMACHI:", machine.x);
-          SERIAL_ECHOPAIR(" yTAM:", y_tam );
-          SERIAL_ECHOPAIR(" yMACHI:", machine.y);
-          SERIAL_ECHOPAIR(" X:", x_tam + machine.x);
-          SERIAL_ECHOPAIR(" Y:", y_tam + machine.y);
-          SERIAL_CHAR(" Jog Mode nhan\n");
+        #if ENABLED(mWorkProtocol)
+          mWorkJogDestination.z = machine.z;
+          jogStepScara(mWorkJogDestination);
+        #else
+          inverse_kinematics(machine);
         #endif
     }
     else{
@@ -2770,7 +2760,7 @@ void Planner::set_machine_position_mm(const float &a, const float &b, const floa
     buffer_sync_block();
   }
   else {
-    #if ENABLED(mWorkDEBUGProtocol)
+    #if ENABLED(mWorkProtocol)
       previous_nominal_speed_sqr = 0.0; // Reset planner junction speeds. Assume start from rest.
       previous_speed.reset();
     #endif
