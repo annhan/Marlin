@@ -583,7 +583,7 @@ void MarlinSettings::postprocess() {
 
       #if HAS_HOTEND_OFFSET
         // Skip hotend 0 which must be 0
-        for (uint8_t e = 1; e < HOTENDS; e++)
+        LOOP_S_L_N(e, 1, HOTENDS)
           EEPROM_WRITE(hotend_offset[e]);
       #endif
     }
@@ -1420,7 +1420,7 @@ void MarlinSettings::postprocess() {
       {
         #if HAS_HOTEND_OFFSET
           // Skip hotend 0 which must be 0
-          for (uint8_t e = 1; e < HOTENDS; e++)
+          LOOP_S_L_N(e, 1, HOTENDS)
             EEPROM_READ(hotend_offset[e]);
         #endif
       }
@@ -1531,10 +1531,10 @@ void MarlinSettings::postprocess() {
         _FIELD_TEST(planner_leveling_active);
         #if ENABLED(AUTO_BED_LEVELING_UBL)
           const bool &planner_leveling_active = planner.leveling_active;
-          const uint8_t &ubl_storage_slot = ubl.storage_slot;
+          const int8_t &ubl_storage_slot = ubl.storage_slot;
         #else
           bool planner_leveling_active;
-          uint8_t ubl_storage_slot;
+          int8_t ubl_storage_slot;
         #endif
         EEPROM_READ(planner_leveling_active);
         EEPROM_READ(ubl_storage_slot);
@@ -2185,8 +2185,10 @@ void MarlinSettings::postprocess() {
     }
 
     #if ENABLED(EEPROM_CHITCHAT) && DISABLED(DISABLE_M503)
-      if (!validating) report();
+      // Report the EEPROM settings
+      if (!validating && (DISABLED(EEPROM_BOOT_SILENT) || IsRunning())) report();
     #endif
+
     EEPROM_FINISH();
 
     return !eeprom_error;
@@ -2925,7 +2927,7 @@ void MarlinSettings::reset() {
     #if HAS_HOTEND_OFFSET
       CONFIG_ECHO_HEADING("Hotend offsets:");
       CONFIG_ECHO_START();
-      for (uint8_t e = 1; e < HOTENDS; e++) {
+      LOOP_S_L_N(e, 1, HOTENDS) {
         SERIAL_ECHOPAIR_P(
           PSTR("  M218 T"), (int)e,
           SP_X_STR, LINEAR_UNIT(hotend_offset[e].x),
