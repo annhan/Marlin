@@ -102,7 +102,9 @@ void forward_kinematics_SCARA(const float &a, const float &b) {
 */
 void jogStepScara(const xyz_pos_t &raw){
   float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
-  delta.set(x_tam + raw.x, y_tam + raw.y, raw.z);
+/*  if (raw.x == 0.0){delta.set(x_tam + raw.x, y_tam + raw.y, raw.z);}
+  else */
+  delta.set(x_tam + raw.x, y_tam + raw.y + raw.x, raw.z);
   forward_kinematics_SCARA(x_tam + raw.x,y_tam + raw.y);
   destination.x=cartes.x;
   current_position.x=cartes.x;
