@@ -685,12 +685,12 @@
 #endif
 
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
-#define X_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Y_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MIN_ENDSTOP_INVERTING false // FALSE :BÌNH THƯỜNG LÀ GẮN VỚI OV/ GẶP CẢM BIẾN LÀ OPEN GẮN VỚI 0V Set to true to invert the logic of the endstop.
-#define X_MAX_ENDSTOP_INVERTING false //TRUE : BÌNH THƯỜNG LÀ HỞ, GẶP CẢM BIẾN GẮN VƠI 0V
-#define Y_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
+#define X_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Y_MIN_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Z_MIN_ENDSTOP_INVERTING true // FALSE :BÌNH THƯỜNG LÀ GẮN VỚI OV/ GẶP CẢM BIẾN LÀ OPEN GẮN VỚI 0V Set to true to invert the logic of the endstop.
+#define X_MAX_ENDSTOP_INVERTING true //TRUE : BÌNH THƯỜNG LÀ HỞ, GẶP CẢM BIẾN GẮN VƠI 0V
+#define Y_MAX_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
+#define Z_MAX_ENDSTOP_INVERTING true // Set to true to invert the logic of the endstop.
 #define Z_MIN_PROBE_ENDSTOP_INVERTING false // Set to true to invert the logic of the probe.
 
 /**
@@ -1155,7 +1155,7 @@
   #define Y_POS_HOME_DEGREE 135
 #endif
 // Homing speeds (mm/m)
-#define HOMING_FEEDRATE_XY (50*60)
+#define HOMING_FEEDRATE_XY (5*60)
 #define HOMING_FEEDRATE_Z  (4*60)
 
 /*

@@ -65,7 +65,7 @@
       #endif
       uint8_t extruder = 0;
       float mm = 360;
-      planner.buffer_segment(A, B, delta.c, e_tam, feedrate, extruder, mm);
+      planner.buffer_segment(A, B, delta.c, e_tam, feedRate, extruder, mm);
       while(endstops.checkEndStop()==false){idle();}
       endstops.validate_homing_move();
     }
@@ -82,7 +82,6 @@
       mWork_Set_Pos_Frome_angles(X_POS_HOME_DEGREE,Y_POS_HOME_DEGREE);
     }
   #else
-  
     static void quick_home_xy() {
       current_position.set(0.0, 0.0);
       #if ENABLED(mWorkDebugGoHome)
