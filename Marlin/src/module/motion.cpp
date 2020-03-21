@@ -278,12 +278,12 @@ void report_current_position_projected() {
  */
 void sync_plan_position() {
   if (DEBUGGING(LEVELING)) DEBUG_POS("sync_plan_position", current_position);
-  #if ENABLED(mWorkDEBUGProtocol)
+  /*#if ENABLED(mWorkDEBUGProtocol)
     SERIAL_ECHOPAIR("SYNC PALN  ", current_position.x);
     SERIAL_ECHOPAIR(":", current_position.y);
     SERIAL_ECHOPAIR(":", current_position.z);
     SERIAL_CHAR("\n");
-  #endif //mWorkDEBUGProtocol
+  #endif //mWorkDEBUGProtocol*/
   planner.set_position_mm(current_position);
 }
 
@@ -337,12 +337,12 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
       #endif
     );
   #endif
-  #if ENABLED(mWorkDebugGoHome)
+  /*#if ENABLED(mWorkDebugGoHome)
     SERIAL_ECHOPAIR("set_current_from_steppers_for_axis  ", pos.x);
     SERIAL_ECHOPAIR(":", pos.y);
     SERIAL_ECHOPAIR(":", pos.z);
     SERIAL_CHAR("\n");
-  #endif //mWorkDEBUGProtocol
+  #endif //mWorkDEBUGProtocol*/
   if (axis == ALL_AXES)
     current_position = pos;
   else
@@ -458,7 +458,7 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
   #elif IS_SCARA
 
-    //if (!position_is_reachable(rx, ry)){ SERIAL_CHAR("position_is_reachable\n");return;}
+    if (!position_is_reachable(rx, ry)){ SERIAL_CHAR("position_is_reachable\n");return;}
 
     destination = current_position;
 
@@ -500,7 +500,7 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
   planner.synchronize();
 }
-void MWORK_do_blocking_move_to(const float rx, const float ry, const float rz, const feedRate_t &fr_mm_s/*=0.0*/) {
+/*void MWORK_do_blocking_move_to(const float rx, const float ry, const float rz, const feedRate_t &fr_mm_s) {
   if (DEBUGGING(LEVELING)) DEBUG_XYZ(">>> do_blocking_move_to", rx, ry, rz);
 
   const feedRate_t z_feedrate = fr_mm_s ?: homing_feedrate(Z_AXIS),
@@ -520,7 +520,7 @@ void MWORK_do_blocking_move_to(const float rx, const float ry, const float rz, c
     }
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< do_blocking_move_to");
   planner.synchronize();
-}
+}*/
 void do_blocking_move_to(const xy_pos_t &raw, const feedRate_t &fr_mm_s/*=0.0f*/) {
   do_blocking_move_to(raw.x, raw.y, current_position.z, fr_mm_s);
 }
@@ -1438,9 +1438,9 @@ void do_homing_move(const AxisEnum axis, const float distance, const feedRate_t 
   #if IS_SCARA
     // Tell the planner the axis is at 0
     current_position[axis] = 0;
-    #if ENABLED(mWorkDebugGoHome)
+    /*#if ENABLED(mWorkDebugGoHome)
       SERIAL_CHAR("SET 0 ALL  \n");
-    #endif //mWorkDEBUGProtocol
+    #endif //mWorkDEBUGProtocol*/
     sync_plan_position();
     current_position[axis] = distance;
     line_to_current_position(real_fr_mm_s);
@@ -1843,10 +1843,10 @@ void homeaxis(const AxisEnum axis) {
   #endif
 
   #if IS_SCARA
-    #if ENABLED(mWorkDebugGoHome)
+    /*#if ENABLED(mWorkDebugGoHome)
       SERIAL_ECHOPAIR("sET AXIT HOME :", axis );
       SERIAL_CHAR("\n");
-    #endif
+    #endif*/
     set_axis_is_at_home(axis);
     sync_plan_position();
 
