@@ -141,7 +141,7 @@ void inverse_kinematics(const xyz_pos_t &raw) {
       SERIAL_ECHOPAIR(":", spos.y);
       SERIAL_CHAR("\n");
     #endif //mWorkDEBUGProtocol*/
-    if ((raw.x >0)&&(raw.y<0)){
+    if ((raw.x >0)&&(raw.y<-100)){
       const float H2 = HYPOT2(spos.x, spos.y);
       float E = -1 *acos((H2 - L1_2 - L2_2) / (2*L1*L2));
       float Q= -1 *(acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));

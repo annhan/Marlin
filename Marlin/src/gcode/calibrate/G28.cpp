@@ -55,54 +55,56 @@
 #include "../../core/debug_out.h"
 
 #if ENABLED(QUICK_HOME)
-  extern Planner planner;
-  static void quick_home_xy() {
-    current_position.set(0.0, 0.0);
-    #if ENABLED(mWorkDebugGoHome)
-      SERIAL_CHAR("QUICK_HOME SET HOME XY\n");
-    #endif
-    sync_plan_position();
-    const int x_axis_home_dir = x_home_dir(active_extruder);
-    const float mlx = max_length(X_AXIS),
-                mly = max_length(Y_AXIS),
-                mlratio = mlx > mly ? mly / mlx : mlx / mly,
-                fr_mm_s = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)) * SQRT(sq(mlratio) + 1.0);
-    #if ENABLED(mWorkDebugGoHome)
-      SERIAL_ECHOPAIR("max LENGH x :", mlx );
-      SERIAL_ECHOPAIR(" Y :", mly );
-      SERIAL_CHAR("\n");
-    #endif
-    do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * home_dir(Y_AXIS), fr_mm_s);
-    endstops.validate_homing_move();
-    current_position.set(0.0, 0.0);
-  }
-  static void mWork_Home_EndStop(double A,double B){
-     float e_tam = 0;
-    feedRate_t feedrate = 5;
-    uint8_t extruder = 0;
-    float mm = 360;
-    planner.buffer_segment(A, B, delta.c, e_tam, feedrate, extruder, mm);
-    while(endstops.checkEndStop()==false){
-      idle();
+  #if IS_SCARA
+    extern Planner planner;
+    static void mWork_Home_EndStop(double A,double B,feedRate_t feedRate){
+      float e_tam = 0;
+      #if ENABLED(mWorkDebugGoHome)
+        SERIAL_ECHOPAIR("feedRate Go Home :", feedRate );
+        SERIAL_CHAR("\n");
+      #endif
+      uint8_t extruder = 0;
+      float mm = 360;
+      planner.buffer_segment(A, B, delta.c, e_tam, feedrate, extruder, mm);
+      while(endstops.checkEndStop()==false){idle();}
+      endstops.validate_homing_move();
     }
-    endstops.validate_homing_move();
-  }
-  static void mWork_quick_home_xy_scara() {
-    // Pretend the current position is 0,0
-    forward_kinematics_SCARA(0,0);
-    current_position.set(cartes.x, cartes.y);
-    #if ENABLED(mWorkDebugGoHome)
-      SERIAL_CHAR("QUICK_HOME SET HOME XY\n");
-    #endif
-    sync_plan_position();
-    mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR);
-    forward_kinematics_SCARA(0,0);
-    current_position.set(cartes.x, cartes.y);
-    sync_plan_position();
-    mWork_Home_EndStop(0,360.0* Y_HOME_DIR);
-    current_position.set(660, 0.0);
-    sync_plan_position();
-  }
+    static void mWork_Set_Pos_Frome_angles(double A, double B){
+      forward_kinematics_SCARA(A,B);
+      current_position.set(cartes.x, cartes.y);
+      sync_plan_position();
+    }
+    static void quick_home_xy() {
+      mWork_Set_Pos_Frome_angles(0,0);
+      mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR,homing_feedrate(X_AXIS)); //Move Y 360 angles and wait endstop
+      mWork_Set_Pos_Frome_angles(0,0);
+      mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
+      mWork_Set_Pos_Frome_angles(X_POS_HOME_DEGREE,Y_POS_HOME_DEGREE);
+    }
+  #else
+  
+    static void quick_home_xy() {
+      current_position.set(0.0, 0.0);
+      #if ENABLED(mWorkDebugGoHome)
+        SERIAL_CHAR("QUICK_HOME SET HOME XY\n");
+      #endif
+      sync_plan_position();
+      const int x_axis_home_dir = x_home_dir(active_extruder);
+      const float mlx = max_length(X_AXIS),
+                  mly = max_length(Y_AXIS),
+                  mlratio = mlx > mly ? mly / mlx : mlx / mly,
+                  fr_mm_s = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)) * SQRT(sq(mlratio) + 1.0);
+      #if ENABLED(mWorkDebugGoHome)
+        SERIAL_ECHOPAIR("max LENGH x :", mlx );
+        SERIAL_ECHOPAIR(" Y :", mly );
+        SERIAL_CHAR("\n");
+      #endif
+      do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * home_dir(Y_AXIS), fr_mm_s);
+      endstops.validate_homing_move();
+      current_position.set(0.0, 0.0);
+    }
+  
+  #endif
   #endif // QUICK_HOME
 
 
@@ -147,12 +149,8 @@ void GcodeSuite::G28() {
     if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("> homing not needed, skip\n<<< G28");
     return;
   }
-
   // Wait for planner moves to finish!
   planner.synchronize();
-  #if ENABLED(CNC_WORKSPACE_PLANES)
-    workspace_plane = PLANE_XY;
-  #endif
   #define HAS_CURRENT_HOME(N) (defined(N##_CURRENT_HOME) && N##_CURRENT_HOME != N##_CURRENT)
   #define HAS_HOMING_CURRENT (HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2))
   remember_feedrate_scaling_off();
@@ -187,12 +185,7 @@ void GcodeSuite::G28() {
     }
 
     #if ENABLED(QUICK_HOME)
-      #if IS_SCARA
-        //if (doX && doY) quick_home_xy();
-        if (doX && doY) mWork_quick_home_xy_scara();
-      #else
         if (doX && doY) quick_home_xy();
-      #endif
     #endif
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) { homeaxis(X_AXIS);}
@@ -208,8 +201,6 @@ void GcodeSuite::G28() {
   restore_feedrate_and_scaling();
   ui.refresh();
   report_current_position();
-  //if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))
-    SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
- // if (DEBUGGING(LEVELING)) 
-  DEBUG_ECHOLNPGM("<<< G28");
+  if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
+  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< G28");
 }
