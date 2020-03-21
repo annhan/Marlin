@@ -141,10 +141,11 @@ void GcodeSuite::get_destination_from_command() {
         destination[i] = current_position[i];
       else
         #if ENABLED(mWorkProtocol)
-          #if ENABLED(mWorkDEBUGProtocol)
-            SERIAL_CHAR(" axis_is_relative\n");
-          #endif       
-          if (axis_is_relative(AxisEnum(i))){           
+         // if (axis_is_relative(AxisEnum(i))){
+          if (axis_relative > 0){           
+              #if ENABLED(mWorkDEBUGProtocol)
+                  SERIAL_CHAR(" axis_is_relative\n");
+               #endif       
               mWorkJogDestination[i] = v; 
               destination[i] = (i<2) ? current_position[i]: current_position[i] + v;          
           }
@@ -155,7 +156,7 @@ void GcodeSuite::get_destination_from_command() {
     }
     else {
         #if ENABLED(mWorkProtocol)
-          if (axis_is_relative(AxisEnum(i))){
+          if (axis_relative > 0){  
             mWorkJogDestination[i] = 0;
           }
           destination[i] = current_position[i];

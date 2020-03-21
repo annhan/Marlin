@@ -2701,7 +2701,7 @@ bool Planner::buffer_line(const float &rx, const float &ry, const float &rz, con
       mm = (delta_mm_cart.x != 0.0 || delta_mm_cart.y != 0.0) ? delta_mm_cart.magnitude() : ABS(delta_mm_cart.z);
 
     // Cartesian XYZ to kinematic ABC, stored in global 'delta'
-    if (gcode.axis_relative){
+    if (gcode.axis_relative>0){
         #if ENABLED(mWorkProtocol)
           mWorkJogDestination.z = machine.z;
           jogStepScara(mWorkJogDestination);
@@ -2785,7 +2785,10 @@ void Planner::set_position_mm(const float &rx, const float &ry, const float &rz,
   #endif
   #if IS_KINEMATIC
     #if ENABLED(mWorkDEBUGProtocol)
-      SERIAL_CHAR("IS KINEMATIC SCARA\n");
+      SERIAL_ECHOPAIR("set_position_mm ", rx);
+      SERIAL_ECHOPAIR(":", ry);
+      SERIAL_ECHOPAIR(":", rz);
+      SERIAL_CHAR("\n");
     #endif
     position_cart.set(rx, ry, rz, e);
     inverse_kinematics(machine);

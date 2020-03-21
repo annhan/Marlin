@@ -278,6 +278,12 @@ void report_current_position_projected() {
  */
 void sync_plan_position() {
   if (DEBUGGING(LEVELING)) DEBUG_POS("sync_plan_position", current_position);
+  #if ENABLED(mWorkDEBUGProtocol)
+    SERIAL_ECHOPAIR("SYNC PALN  ", current_position.x);
+    SERIAL_ECHOPAIR(":", current_position.y);
+    SERIAL_ECHOPAIR(":", current_position.z);
+    SERIAL_CHAR("\n");
+  #endif //mWorkDEBUGProtocol
   planner.set_position_mm(current_position);
 }
 
@@ -331,7 +337,12 @@ void set_current_from_steppers_for_axis(const AxisEnum axis) {
       #endif
     );
   #endif
-
+  #if ENABLED(mWorkDebugGoHome)
+    SERIAL_ECHOPAIR("set_current_from_steppers_for_axis  ", pos.x);
+    SERIAL_ECHOPAIR(":", pos.y);
+    SERIAL_ECHOPAIR(":", pos.z);
+    SERIAL_CHAR("\n");
+  #endif //mWorkDEBUGProtocol
   if (axis == ALL_AXES)
     current_position = pos;
   else
@@ -358,7 +369,7 @@ void line_to_current_position(const feedRate_t &fr_mm_s/*=feedrate_mm_s*/) {
       // UBL segmented line will do Z-only moves in single segment
       ubl.line_to_destination_segmented(scaled_fr_mm_s);
     #else
-      if (!gcode.axis_relative){if (current_position == destination) return;}
+      if (gcode.axis_relative == 0){if (current_position == destination) return;}
       planner.buffer_line(destination, scaled_fr_mm_s, active_extruder);
     #endif
 
@@ -447,9 +458,7 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
   #elif IS_SCARA
 
-    if (!position_is_reachable(rx, ry)){ 
-	SERIAL_CHAR("position_is_reachable\n");
-	return;}
+    //if (!position_is_reachable(rx, ry)){ SERIAL_CHAR("position_is_reachable\n");return;}
 
     destination = current_position;
 
@@ -491,7 +500,27 @@ void do_blocking_move_to(const float rx, const float ry, const float rz, const f
 
   planner.synchronize();
 }
+void MWORK_do_blocking_move_to(const float rx, const float ry, const float rz, const feedRate_t &fr_mm_s/*=0.0*/) {
+  if (DEBUGGING(LEVELING)) DEBUG_XYZ(">>> do_blocking_move_to", rx, ry, rz);
 
+  const feedRate_t z_feedrate = fr_mm_s ?: homing_feedrate(Z_AXIS),
+                  xy_feedrate = fr_mm_s ?: feedRate_t(XY_PROBE_FEEDRATE_MM_S);
+    destination = current_position;
+    // If Z needs to raise, do it before moving XY
+    if (destination.z < rz) {
+      destination.z = rz;
+      prepare_internal_fast_move_to_destination(z_feedrate);
+    }
+    destination.set(rx, ry);
+    prepare_internal_fast_move_to_destination(xy_feedrate);
+    // If Z needs to lower, do it after moving XY
+    if (destination.z > rz) {
+      destination.z = rz;
+      prepare_internal_fast_move_to_destination(z_feedrate);
+    }
+  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< do_blocking_move_to");
+  planner.synchronize();
+}
 void do_blocking_move_to(const xy_pos_t &raw, const feedRate_t &fr_mm_s/*=0.0f*/) {
   do_blocking_move_to(raw.x, raw.y, current_position.z, fr_mm_s);
 }
@@ -830,28 +859,38 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
     //*/
 
     // Get the current position as starting point
-    xyze_pos_t raw = current_position;
 
-    
+
+    xyze_pos_t raw = current_position;  
     static millis_t next_idle_ms = millis() + 200UL;
     float feedrate_mwork = MMS_SCALED(feedrate_mm_s);
     float mWorkTimeDelaySegment = cartesian_segment_mm;
     if ((raw.x == 0) ||(raw.y ==0)){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
-    raw += segment_distance;
-    planner.buffer_line(raw,  feedrate_mwork, active_extruder, cartesian_segment_mm
+    // nẾU JOG LÀM NGƯỢC CHIỀU CỦA CÁNH TAY, TRƯỚC KHI CHẠY PHẢI ĐỔI CHIỀU KO SẼ BỊ VỌT LÚC ĐẦU GÂY MẤT BƯỚC
+    float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
+    if (y_tam < x_tam){
+        planner.buffer_line(raw, 50, active_extruder, 0
         #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
         #endif
     );
+    }
+    raw += segment_distance;
+      planner.buffer_line(raw,  feedrate_mwork, active_extruder, cartesian_segment_mm
+        #if ENABLED(SCARA_FEEDRATE_SCALING)
+        , inv_duration
+        #endif
+    );
+    
     segments = segments- 1;
     if (segments>1){
       while (--segments) {
-        #if ENABLED(mWorkDEBUGProtocol)
+        /*#if ENABLED(mWorkDEBUGProtocol)
           SERIAL_ECHOPAIR("p", raw.x);
           SERIAL_ECHOPAIR(":", raw.y);
           SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
           SERIAL_CHAR("\n");
-        #endif
+        #endif*/
         segment_idle(next_idle_ms);
         raw += segment_distance;
         
@@ -864,7 +903,7 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
         
       }
     }
-    #if ENABLED(mWorkDEBUGProtocol)
+    /*#if ENABLED(mWorkDEBUGProtocol)
       SERIAL_ECHOPAIR("p", raw.x);
       SERIAL_ECHOPAIR(":", raw.y);
       SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
@@ -872,7 +911,7 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
       SERIAL_ECHOPAIR("finish=", destination.x);
       SERIAL_ECHOPAIR(":", destination.y);
       SERIAL_CHAR("\n");
-    #endif
+    #endif*/
     feedrate_mwork = MMS_SCALED(feedrate_mm_s);
     mWorkTimeDelaySegment = cartesian_segment_mm;
     if ((destination.x == 0) ||(destination.y ==0) ){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
@@ -1399,6 +1438,9 @@ void do_homing_move(const AxisEnum axis, const float distance, const feedRate_t 
   #if IS_SCARA
     // Tell the planner the axis is at 0
     current_position[axis] = 0;
+    #if ENABLED(mWorkDebugGoHome)
+      SERIAL_CHAR("SET 0 ALL  \n");
+    #endif //mWorkDEBUGProtocol
     sync_plan_position();
     current_position[axis] = distance;
     line_to_current_position(real_fr_mm_s);
@@ -1801,7 +1843,10 @@ void homeaxis(const AxisEnum axis) {
   #endif
 
   #if IS_SCARA
-
+    #if ENABLED(mWorkDebugGoHome)
+      SERIAL_ECHOPAIR("sET AXIT HOME :", axis );
+      SERIAL_CHAR("\n");
+    #endif
     set_axis_is_at_home(axis);
     sync_plan_position();
 

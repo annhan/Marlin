@@ -34,11 +34,14 @@
 
 float delta_segments_per_second = SCARA_SEGMENTS_PER_SECOND;
 
+
 void scara_set_axis_is_at_home(const AxisEnum axis) {
   if (axis == Z_AXIS)
     current_position.z = Z_HOME_POS;
   else {
-
+    #if ENABLED(mWorkDebugGoHome)
+      SERIAL_CHAR("SET HOME XY\n");
+    #endif
     /**
      * SCARA homes XY at the same time
      */
@@ -102,6 +105,8 @@ void jogStepScara(const xyz_pos_t &raw){
   delta.set(x_tam + raw.x, y_tam + raw.y, raw.z);
   forward_kinematics_SCARA(x_tam + raw.x,y_tam + raw.y);
   destination.x=cartes.x;
+  current_position.x=cartes.x;
+  current_position.y=cartes.y;
   destination.y=cartes.y;
   #if ENABLED(mWorkDEBUGProtocol)
     SERIAL_ECHOPAIR("XPOS:", x_tam );
@@ -127,38 +132,40 @@ void inverse_kinematics(const xyz_pos_t &raw) {
      */
 		/*
     */
-	float C2, S2, SK1, SK2, THETA, PSI;
-	const xy_pos_t spos = raw - scara_offset;
-  #if ENABLED(mWorkDEBUGProtocol)
-    SERIAL_ECHOPAIR("SCARA ", spos.x);
-    SERIAL_ECHOPAIR(":", spos.y);
-    SERIAL_CHAR("\n");
-  #endif //mWorkDEBUGProtocol
-  if ((raw.x >0)&&(raw.y<0)){
-    const float H2 = HYPOT2(spos.x, spos.y);
-    float E = -1 *acos((H2 - L1_2 - L2_2) / (2*L1*L2));
-    float Q= -1 *(acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
-    float S = atan2(spos.y,spos.x) - Q;
-    THETA = S;
-    PSI = E;
-  }
-  else{
-    const float H2 = HYPOT2(spos.x, spos.y);
-    float E = acos((H2 - L1_2 - L2_2) / (2*L1*L2));
-    float Q= (acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
-    float S = atan2(spos.y,spos.x) - Q;
-    THETA = S;
-    PSI = E;
-  }
-  double doX=DEGREES(THETA);
-  double doY=DEGREES(PSI);
-  
-	delta.set(doX, doY + doX, raw.z);
-  #if ENABLED(mWorkDEBUGProtocol)
-    SERIAL_ECHOPAIR("SCARA ", doX);
-    SERIAL_ECHOPAIR(":", doY);
-    SERIAL_CHAR("\n");
-  #endif //mWorkDEBUGProtocol
+    float C2, S2, SK1, SK2, THETA, PSI;
+    const xy_pos_t spos = raw - scara_offset;
+    #if ENABLED(mWorkDEBUGProtocol)
+      SERIAL_ECHOPAIR("BEGIN SCARA ", spos.x);
+      SERIAL_ECHOPAIR(":", spos.y);
+      SERIAL_CHAR("\n");
+    #endif //mWorkDEBUGProtocol*/
+    if ((raw.x >0)&&(raw.y<0)){
+      const float H2 = HYPOT2(spos.x, spos.y);
+      float E = -1 *acos((H2 - L1_2 - L2_2) / (2*L1*L2));
+      float Q= -1 *(acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
+      float S = atan2(spos.y,spos.x) - Q;
+      THETA = S;
+      PSI = E;
+    }
+    else{
+      const float H2 = HYPOT2(spos.x, spos.y);
+      float E = acos((H2 - L1_2 - L2_2) / (2*L1*L2));
+      float Q= (acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
+      float S = atan2(spos.y,spos.x) - Q;
+      THETA = S;
+      PSI = E;
+    }
+    double doX=DEGREES(THETA);
+    double doY=DEGREES(PSI);
+    float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
+    if (isnan(doX)) {doX=x_tam; SERIAL_CHAR("NAN X\n");}
+    if (isnan(doY)) {doY=y_tam; SERIAL_CHAR("NAN Y\n");}
+    delta.set(doX, doY + doX, raw.z);
+    #if ENABLED(mWorkDEBUGProtocol)
+      SERIAL_ECHOPAIR("SCARA ", doX);
+      SERIAL_ECHOPAIR(":", doY);
+      SERIAL_CHAR("\n");
+    #endif //mWorkDEBUGProtocol
   #else // MP_SCARA
 
     const float x = raw.x, y = raw.y, c = HYPOT(x, y),
