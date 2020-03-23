@@ -270,6 +270,7 @@ void setup_powerhold() {
  * Sensitive pin test for M42, M226
  */
 
+
 #include "pins/sensitive_pins.h"
 
 bool pin_is_protected(const pin_t pin) {
@@ -924,9 +925,12 @@ void setup() {
       while (!MYSERIAL1 && PENDING(millis(), serial_connect_timeout)) { /*nada*/ }
     #endif
   #endif
+  #if ENABLED(mWorkDEBUGProtocol)
+  #else
+    SERIAL_ECHOLNPGM("start");
+    SERIAL_ECHO_START();
+  #endif
 
-  SERIAL_ECHOLNPGM("start");
-  SERIAL_ECHO_START();
 
   #if HAS_TMC_SPI
     #if DISABLED(TMC_USE_SW_SPI)
@@ -947,12 +951,15 @@ void setup() {
   if (mcu &  8) SERIAL_ECHOLNPGM(STR_WATCHDOG_RESET);
   if (mcu & 32) SERIAL_ECHOLNPGM(STR_SOFTWARE_RESET);
   HAL_clear_reset_source();
-
+  #if ENABLED(mWorkDEBUGProtocol)
+  #else
   serialprintPGM(GET_TEXT(MSG_MARLIN));
   SERIAL_CHAR(' ');
   SERIAL_ECHOLNPGM(SHORT_BUILD_VERSION);
   SERIAL_EOL();
+  #endif
 
+/*
   #if defined(STRING_DISTRIBUTION_DATE) && defined(STRING_CONFIG_H_AUTHOR)
     SERIAL_ECHO_MSG(
       STR_CONFIGURATION_VER
@@ -961,10 +968,12 @@ void setup() {
     );
     SERIAL_ECHO_MSG("Compiled: " __DATE__);
   #endif
-
-  SERIAL_ECHO_START();
-  SERIAL_ECHOLNPAIR(STR_FREE_MEMORY, freeMemory(), STR_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
-
+  */
+  #if ENABLED(mWorkDEBUGProtocol)
+  #else
+   SERIAL_ECHO_START();
+    SERIAL_ECHOLNPAIR(STR_FREE_MEMORY, freeMemory(), STR_PLANNER_BUFFER_BYTES, (int)sizeof(block_t) * (BLOCK_BUFFER_SIZE));
+  #endif
   // UI must be initialized before EEPROM
   // (because EEPROM code calls the UI).
 
