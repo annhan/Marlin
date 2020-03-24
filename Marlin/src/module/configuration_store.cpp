@@ -2921,7 +2921,7 @@ void MarlinSettings::reset() {
       , PSTR(" R"), LINEAR_UNIT(planner.settings.retract_acceleration)
       , SP_T_STR, LINEAR_UNIT(planner.settings.travel_acceleration)
     );
-
+/*
     CONFIG_ECHO_HEADING(
       "Advanced: B<min_segment_time_us> S<min_feedrate> T<min_travel_feedrate>"
       #if DISABLED(CLASSIC_JERK)
@@ -2934,6 +2934,7 @@ void MarlinSettings::reset() {
         #endif
       #endif
     );
+    
     CONFIG_ECHO_START();
     SERIAL_ECHOLNPAIR_P(
         PSTR("  M205 B"), LINEAR_UNIT(planner.settings.min_segment_time_us)
@@ -2951,7 +2952,7 @@ void MarlinSettings::reset() {
         #endif
       #endif
     );
-
+*/
     #if HAS_M206_COMMAND
       CONFIG_ECHO_HEADING("Home offset:");
       CONFIG_ECHO_START();
@@ -3081,7 +3082,7 @@ void MarlinSettings::reset() {
     #endif // EDITABLE_SERVO_ANGLES
 
     #if HAS_SCARA_OFFSET
-
+/*
       CONFIG_ECHO_HEADING("SCARA settings: S<seg-per-sec> P<theta-psi-offset> T<theta-offset>");
       CONFIG_ECHO_START();
       SERIAL_ECHOLNPAIR_P(
@@ -3090,7 +3091,7 @@ void MarlinSettings::reset() {
         , SP_T_STR, scara_home_offset.b
         , SP_Z_STR, LINEAR_UNIT(scara_home_offset.z)
       );
-
+*/
     #elif ENABLED(DELTA)
 
       CONFIG_ECHO_HEADING("Endstop adjustment:");
@@ -3587,6 +3588,7 @@ void MarlinSettings::reset() {
      * Linear Advance
      */
     #if ENABLED(LIN_ADVANCE)
+    /*
       CONFIG_ECHO_HEADING("Linear Advance:");
       CONFIG_ECHO_START();
       #if EXTRUDERS < 2
@@ -3595,6 +3597,7 @@ void MarlinSettings::reset() {
         LOOP_L_N(i, EXTRUDERS)
           SERIAL_ECHOLNPAIR("  M900 T", int(i), " K", planner.extruder_advance_K[i]);
       #endif
+      */
     #endif
 
     #if HAS_MOTOR_CURRENT_PWM

@@ -23,8 +23,8 @@
 
 
 #define mWorkProtocol
-#define mWorkDEBUGProtocol
-#define mWorkDebugGoHome
+//#define mWorkDEBUGProtocol
+//#define mWorkDebugGoHome
 /**
  * Configuration_adv.h
  *

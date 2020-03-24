@@ -843,7 +843,7 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
 
     // The approximate length of each segment
     const double   inv_segments = 1.0f / double(segments),
-                cartesian_segment_mm = cartesian_mm * inv_segments;
+     cartesian_segment_mm = cartesian_mm * inv_segments;
     const xyze_float_t segment_distance = diff * float(inv_segments);
 
     #if ENABLED(SCARA_FEEDRATE_SCALING)
@@ -865,7 +865,7 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
     static millis_t next_idle_ms = millis() + 200UL;
     float feedrate_mwork = MMS_SCALED(feedrate_mm_s);
     float mWorkTimeDelaySegment = cartesian_segment_mm;
-    if ((raw.x == 0) ||(raw.y ==0)){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
+    if ((raw.x == 0) ||(raw.y ==0)){ feedrate_mwork = 1;mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
     // nẾU JOG LÀM NGƯỢC CHIỀU CỦA CÁNH TAY, TRƯỚC KHI CHẠY PHẢI ĐỔI CHIỀU KO SẼ BỊ VỌT LÚC ĐẦU GÂY MẤT BƯỚC
     float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
     if (y_tam < x_tam){
@@ -885,15 +885,8 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
     segments = segments- 1;
     if (segments>1){
       while (--segments) {
-        /*#if ENABLED(mWorkDEBUGProtocol)
-          SERIAL_ECHOPAIR("p", raw.x);
-          SERIAL_ECHOPAIR(":", raw.y);
-          SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
-          SERIAL_CHAR("\n");
-        #endif*/
         segment_idle(next_idle_ms);
-        raw += segment_distance;
-        
+        raw += segment_distance;      
         if (!planner.buffer_line(raw, scaled_fr_mm_s, active_extruder, cartesian_segment_mm
           #if ENABLED(SCARA_FEEDRATE_SCALING)
             , inv_duration
@@ -903,19 +896,22 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
         
       }
     }
-    /*#if ENABLED(mWorkDEBUGProtocol)
-      SERIAL_ECHOPAIR("p", raw.x);
+    #if ENABLED(mWorkDEBUGProtocol)
+      SERIAL_ECHOPAIR("RAW", raw.x);
       SERIAL_ECHOPAIR(":", raw.y);
-      SERIAL_ECHOPAIR(" F:", scaled_fr_mm_s);
       SERIAL_CHAR("\n");
-      SERIAL_ECHOPAIR("finish=", destination.x);
-      SERIAL_ECHOPAIR(":", destination.y);
-      SERIAL_CHAR("\n");
-    #endif*/
+    #endif
     feedrate_mwork = MMS_SCALED(feedrate_mm_s);
     mWorkTimeDelaySegment = cartesian_segment_mm;
-    if ((destination.x == 0) ||(destination.y ==0) ){ feedrate_mwork = MMS_SCALED(feedrate_mm_s/2);mWorkTimeDelaySegment=mWorkTimeDelaySegment*3;}
-    planner.buffer_line(destination, feedrate_mwork, active_extruder, cartesian_segment_mm
+    if ((destination.x == 0) ||(destination.y ==0) ){ 
+      feedrate_mwork = 1;
+      planner.buffer_line(destination, 1, active_extruder, cartesian_segment_mm
+      #if ENABLED(SCARA_FEEDRATE_SCALING)
+        , inv_duration
+      #endif
+      );
+    }
+    else planner.buffer_line(destination, feedrate_mwork, active_extruder, cartesian_segment_mm
       #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
       #endif

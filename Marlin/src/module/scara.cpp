@@ -136,7 +136,7 @@ void inverse_kinematics(const xyz_pos_t &raw) {
     */
     float C2, S2, SK1, SK2, THETA, PSI;
     const xy_pos_t spos = raw - scara_offset;
-    #if ENABLED(mWorkDEBUGProtocol)
+    /*#if ENABLED(mWorkDEBUGProtocol)
       SERIAL_ECHOPAIR("BEGIN SCARA ", spos.x);
       SERIAL_ECHOPAIR(":", spos.y);
       SERIAL_CHAR("\n");
@@ -148,21 +148,41 @@ void inverse_kinematics(const xyz_pos_t &raw) {
       float S = atan2(spos.y,spos.x) - Q;
       THETA = S;
       PSI = E;
+      SERIAL_CHAR("THUAN\n");
     }
     else{
-      const float H2 = HYPOT2(spos.x, spos.y);
+      /*const float H2 = HYPOT2(spos.x, spos.y);
       float E = acos((H2 - L1_2 - L2_2) / (2*L1*L2));
       float Q= (acos((H2 + L1_2 - L2_2) / (2*L1*sqrt(H2))));
       float S = atan2(spos.y,spos.x) - Q;
       THETA = S;
-      PSI = E;
+      PSI = E;l*/
+     const float H2 = HYPOT2(spos.x, spos.y);
+    if (L1 == L2)
+      C2 = H2 / L1_2_2 - 1;
+    else
+      C2 = (H2 - (L1_2 + L2_2)) / (2.0f * L1 * L2);
+
+    S2 = SQRT(1.0f - sq(C2));
+
+    // Unrotated Arm1 plus rotated Arm2 gives the distance from Center to End
+    SK1 = L1 + L2 * C2;
+
+    // Rotated Arm2 gives the distance from Arm1 to Arm2
+    SK2 = L2 * S2;
+
+    // Angle of Arm1 is the difference between Center-to-End angle and the Center-to-Elbow
+    THETA = ATAN2(SK1, SK2) - ATAN2(spos.x, spos.y);
+
+    // Angle of Arm2
+    PSI = ATAN2(S2, C2);
     }
     double doX=DEGREES(THETA);
-    double doY=DEGREES(PSI);
+    double doY=DEGREES(PSI + THETA);
     float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
     if (isnan(doX)) {doX=x_tam; SERIAL_CHAR("NAN X\n");}
     if (isnan(doY)) {doY=y_tam; SERIAL_CHAR("NAN Y\n");}
-    delta.set(doX, doY + doX, raw.z);
+    delta.set(doX, doY, raw.z);
     #if ENABLED(mWorkDEBUGProtocol)
       SERIAL_ECHOPAIR("SCARA ", doX);
       SERIAL_ECHOPAIR(":", doY);
