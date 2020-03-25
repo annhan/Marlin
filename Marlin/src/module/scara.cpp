@@ -105,7 +105,7 @@ void jogStepScara(const xyz_pos_t &raw){
 /*  if (raw.x == 0.0){delta.set(x_tam + raw.x, y_tam + raw.y, raw.z);}
   else */
   delta.set(x_tam + raw.x, y_tam + raw.y + x_tam + raw.x, raw.z);
-  forward_kinematics_SCARA(x_tam + raw.x,y_tam + raw.y + x_tam + raw.x, raw.z);
+  forward_kinematics_SCARA(x_tam + raw.x,y_tam + raw.y + x_tam + raw.x);
   destination.x=cartes.x;
   current_position.x=cartes.x;
   current_position.y=cartes.y;
