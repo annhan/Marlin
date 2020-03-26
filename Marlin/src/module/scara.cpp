@@ -148,7 +148,7 @@ void inverse_kinematics(const xyz_pos_t &raw) {
       float S = atan2(spos.y,spos.x) - Q;
       THETA = S;
       PSI = E;
-      SERIAL_CHAR("THUAN\n");
+      //SERIAL_CHAR("THUAN\n");
     }
     else{
       /*const float H2 = HYPOT2(spos.x, spos.y);
@@ -180,8 +180,9 @@ void inverse_kinematics(const xyz_pos_t &raw) {
     double doX=DEGREES(THETA);
     double doY=DEGREES(PSI + THETA);
     float x_tam =planner.get_axis_position_degrees(A_AXIS), y_tam=planner.get_axis_position_degrees(B_AXIS);
-    if (isnan(doX)) {doX=x_tam; SERIAL_CHAR("NAN X\n");}
+   /* if (isnan(doX)) {doX=x_tam; SERIAL_CHAR("NAN X\n");}
     if (isnan(doY)) {doY=y_tam; SERIAL_CHAR("NAN Y\n");}
+    */
     delta.set(doX, doY, raw.z);
     #if ENABLED(mWorkDEBUGProtocol)
       SERIAL_ECHOPAIR("SCARA ", doX);
