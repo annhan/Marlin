@@ -165,6 +165,49 @@ void GcodeSuite::G28() {
   planner.synchronize();
   #define HAS_CURRENT_HOME(N) (defined(N##_CURRENT_HOME) && N##_CURRENT_HOME != N##_CURRENT)
   #define HAS_HOMING_CURRENT (HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2))
+
+  #if HAS_HOMING_CURRENT
+    auto debug_current = [](PGM_P const s, const int16_t a, const int16_t b){
+      serialprintPGM(s); DEBUG_ECHOLNPAIR(" current: ", a, " -> ", b);
+    };
+    #if HAS_CURRENT_HOME(X)
+      const int16_t tmc_save_current_X = stepperX.getMilliamps();
+      stepperX.rms_current(X_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("X"), tmc_save_current_X, X_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(X2)
+      const int16_t tmc_save_current_X2 = stepperX2.getMilliamps();
+      stepperX2.rms_current(X2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("X2"), tmc_save_current_X2, X2_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(Y)
+      const int16_t tmc_save_current_Y = stepperY.getMilliamps();
+      stepperY.rms_current(Y_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y"), tmc_save_current_Y, Y_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(Y2)
+      const int16_t tmc_save_current_Y2 = stepperY2.getMilliamps();
+      stepperY2.rms_current(Y2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y2"), tmc_save_current_Y2, Y2_CURRENT_HOME);
+    #endif
+  #endif
+
+  #if ENABLED(IMPROVE_HOMING_RELIABILITY)
+    slow_homing_t slow_homing = begin_slow_homing();
+  #endif
+
+  // Always home with tool 0 active
+  #if HOTENDS > 1
+    #if DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE)
+      const uint8_t old_tool_index = active_extruder;
+    #endif
+    tool_change(0, true);
+  #endif
+
+  #if HAS_DUPLICATION_MODE
+    extruder_duplication_enabled = false;
+  #endif
+
   remember_feedrate_scaling_off();
 
   endstops.enable(true); // Enable endstops for next homing move
@@ -197,8 +240,15 @@ void GcodeSuite::G28() {
     }
 
     #if ENABLED(QUICK_HOME)
-        if (doX && doY) quick_home_xy();
+
+      if (doX && doY) quick_home_xy();
+
     #endif
+
+    // Home Y (before X)
+    if (ENABLED(HOME_Y_BEFORE_X) && (doY || (ENABLED(CODEPENDENT_XY_HOMING) && doX)))
+      homeaxis(Y_AXIS);
+
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) { homeaxis(X_AXIS);}
     // Home Y (after X)
