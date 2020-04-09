@@ -44,23 +44,28 @@ typedef struct {
  * Z-probes like the P.I.N.D.A V2 allow for compensation of
  * measurement errors/shifts due to changed temperature.
  */
+
+static constexpr temp_calib_t cali_info_init[TSI_COUNT] = {
+    {  10,  5,  30,  30 + 10 *  5 },       // Probe
+    {  10,  5,  60,  60 + 10 *  5 },       // Bed
+  #if ENABLED(USE_TEMP_EXT_COMPENSATION)
+    {  20,  5, 180, 180 +  5 * 20 }        // Extruder
+  #endif
+};
+
 class ProbeTempComp {
   public:
 
-    static constexpr temp_calib_t cali_info_init[TSI_COUNT] = {
-        {  10,  5,  30,  30 + 10 *  5 },       // Probe
-        {  10,  5,  60,  60 + 10 *  5 },       // Bed
-      #if ENABLED(USE_TEMP_EXT_COMPENSATION)
-        {  20,  5, 180, 180 +  5 * 20 }        // Extruder
-      #endif
-    };
     static const temp_calib_t cali_info[TSI_COUNT];
 
     // Where to park nozzle to wait for probe cooldown
-    static constexpr xyz_pos_t park_point = { PTC_PARK_POS_X, PTC_PARK_POS_Y, PTC_PARK_POS_Z };
+    static constexpr xyz_pos_t park_point = PTC_PARK_POS;
 
-    static constexpr int  max_bed_temp         = PTC_MAX_BED_TEMP,  // Max temperature to avoid heating errors
-                          probe_calib_bed_temp = max_bed_temp,      // Bed temperature while calibrating probe
+    // XY coordinates of nozzle for probing the bed
+    static constexpr xy_pos_t measure_point    = PTC_PROBE_POS;     // Coordinates to probe
+                            //measure_point    = { 12.0f, 7.3f };   // Coordinates for the MK52 magnetic heatbed
+
+    static constexpr int  probe_calib_bed_temp = BED_MAXTEMP - 10,  // Bed temperature while calibrating probe
                           bed_calib_probe_temp = 30;                // Probe temperature while calibrating bed
 
     static int16_t *sensor_z_offsets[TSI_COUNT],
