@@ -122,10 +122,10 @@
 //
 #if EITHER(SPINDLE_FEATURE, LASER_FEATURE)
   #define HAS_CUTTER 1
-  #define _CUTTER_DISP_PWM     1
+  #define _CUTTER_DISP_PWM1     1
   #define _CUTTER_DISP_PERCENT 2
   #define _CUTTER_DISP_RPM     3
-  #define _CUTTER_DISP(V)      _CAT(_CUTTER_DISP_, V)
+  #define _CUTTER_DISP(V)      (_CAT(_CUTTER_DISP_,V))
   #define CUTTER_DISPLAY_IS(V) (_CUTTER_DISP(CUTTER_POWER_DISPLAY) == _CUTTER_DISP(V))
 #endif
 
