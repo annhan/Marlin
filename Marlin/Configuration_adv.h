@@ -2653,18 +2653,16 @@
  *
  * See https://marlinfw.org/docs/configuration/laser_spindle.html for more config details.
  */
-#define SPINDLE_LASER_ENA_PIN 14   // digital pin
+#define SPINDLE_LASER_ENA_PIN    4   // digital pin
 #define SPINDLE_LASER_PWM_PIN    7   // digital pin - MUST BE HARDWARE PWM
-#define SPINDLE_DIR_PIN          15   // digital pin
+#define SPINDLE_DIR_PIN          68   // digital pin
 #define SPINDLE_FEATURE
 //#define LASER_FEATURE
 #if EITHER(SPINDLE_FEATURE, LASER_FEATURE)
   #define SPINDLE_LASER_ACTIVE_HIGH     true  // Set to "true" if the on/off function is active HIGH
   #define SPINDLE_LASER_PWM             true   // Set to "true" if your controller supports setting the speed/power
   #define SPINDLE_LASER_PWM_INVERT      true   // Set to "true" if the speed/power goes up when you want it to go slower
-
   #define SPINDLE_LASER_FREQUENCY       2500   // (Hz) Spindle/laser frequency (only on supported HALs: AVR and LPC)
-
   /**
    * Speed / Power can be set ('M3 S') and displayed in terms of:
    *  - PWM     (S0 - S255)
