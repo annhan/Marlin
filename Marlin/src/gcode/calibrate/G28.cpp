@@ -27,7 +27,7 @@
 #include "../../module/stepper.h"
 #include "../../module/endstops.h"
 
-#if HOTENDS > 1
+#if HAS_MULTI_HOTEND
   #include "../../module/tool_change.h"
 #endif
 
@@ -197,7 +197,7 @@ void GcodeSuite::G28() {
   #endif
 
   // Always home with tool 0 active
-  #if HOTENDS > 1
+  #if HAS_MULTI_HOTEND
     #if DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE)
       const uint8_t old_tool_index = active_extruder;
     #endif
@@ -261,6 +261,28 @@ void GcodeSuite::G28() {
   sync_plan_position();
   endstops.not_homing();
   restore_feedrate_and_scaling();
+
+  // Restore the active tool after homing
+  #if HAS_MULTI_HOTEND && (DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE))
+    tool_change(old_tool_index, NONE(PARKING_EXTRUDER, DUAL_X_CARRIAGE));   // Do move if one of these
+  #endif
+
+  #if HAS_HOMING_CURRENT
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Restore driver current...");
+    #if HAS_CURRENT_HOME(X)
+      stepperX.rms_current(tmc_save_current_X);
+    #endif
+    #if HAS_CURRENT_HOME(X2)
+      stepperX2.rms_current(tmc_save_current_X2);
+    #endif
+    #if HAS_CURRENT_HOME(Y)
+      stepperY.rms_current(tmc_save_current_Y);
+    #endif
+    #if HAS_CURRENT_HOME(Y2)
+      stepperY2.rms_current(tmc_save_current_Y2);
+    #endif
+  #endif
+
   ui.refresh();
   report_current_position();
   if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
