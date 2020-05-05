@@ -338,9 +338,7 @@
 #endif
 #if ENABLED(ULTIPANEL)
   #define IS_ULTRA_LCD
-  #ifndef NEWPANEL
-    #define NEWPANEL
-  #endif
+  #define NEWPANEL
 #endif
 
 #if ENABLED(IS_ULTRA_LCD)
