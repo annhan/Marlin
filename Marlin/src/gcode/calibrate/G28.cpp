@@ -164,7 +164,9 @@ void GcodeSuite::G28() {
   // Wait for planner moves to finish!
   planner.synchronize();
   #define HAS_CURRENT_HOME(N) (defined(N##_CURRENT_HOME) && N##_CURRENT_HOME != N##_CURRENT)
-  #define HAS_HOMING_CURRENT (HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2))
+  #if HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2)
+    #define HAS_HOMING_CURRENT 1
+  #endif
 
   #if HAS_HOMING_CURRENT
     auto debug_current = [](PGM_P const s, const int16_t a, const int16_t b){
@@ -192,9 +194,7 @@ void GcodeSuite::G28() {
     #endif
   #endif
 
-  #if ENABLED(IMPROVE_HOMING_RELIABILITY)
-    slow_homing_t slow_homing = begin_slow_homing();
-  #endif
+  TERN_(IMPROVE_HOMING_RELIABILITY, slow_homing_t slow_homing = begin_slow_homing());
 
   // Always home with tool 0 active
   #if HAS_MULTI_HOTEND
@@ -204,9 +204,7 @@ void GcodeSuite::G28() {
     tool_change(0, true);
   #endif
 
-  #if HAS_DUPLICATION_MODE
-    extruder_duplication_enabled = false;
-  #endif
+  TERN_(HAS_DUPLICATION_MODE, extruder_duplication_enabled = false);
 
   remember_feedrate_scaling_off();
 
