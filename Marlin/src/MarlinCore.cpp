@@ -1050,6 +1050,7 @@ void setup()
 #if HAS_COLOR_LEDS
   SETUP_RUN(leds.setup());
 #endif
+
 #if ENABLED(USE_CONTROLLER_FAN) // Set up fan controller to initialize also the default configurations.
   SETUP_RUN(controllerFan.setup());
 #endif
@@ -1101,7 +1102,6 @@ void setup()
 
 #if HAS_PHOTOGRAPH
   OUT_WRITE(PHOTOGRAPH_PIN, LOW);
-
 #endif
 
 #if HAS_CUTTER
