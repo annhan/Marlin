@@ -183,26 +183,17 @@ bool G38_did_trigger; // = false
 #include "libs/L64XX/L64XX_Marlin.h"
 #endif
 
-const char NUL_STR[] PROGMEM = "",
-                     M112_KILL_STR[] PROGMEM = "M112 Shutdown",
-                     G28_STR[] PROGMEM = "G28",
-                     M21_STR[] PROGMEM = "M21",
-                     M23_STR[] PROGMEM = "M23 %s",
-                     M24_STR[] PROGMEM = "M24",
-                     SP_P_STR[] PROGMEM = " P",
-                     SP_T_STR[] PROGMEM = " T",
-                     SP_X_STR[] PROGMEM = " X",
-                     SP_Y_STR[] PROGMEM = " Y",
-                     SP_Z_STR[] PROGMEM = " Z",
-                     SP_E_STR[] PROGMEM = " E",
-                     X_LBL[] PROGMEM = "X:",
-                     Y_LBL[] PROGMEM = "Y:",
-                     Z_LBL[] PROGMEM = "Z:",
-                     E_LBL[] PROGMEM = "E:",
-                     SP_X_LBL[] PROGMEM = " X:",
-                     SP_Y_LBL[] PROGMEM = " Y:",
-                     SP_Z_LBL[] PROGMEM = " Z:",
-                     SP_E_LBL[] PROGMEM = " E:";
+PGMSTR(NUL_STR, "");
+PGMSTR(M112_KILL_STR, "M112 Shutdown");
+PGMSTR(G28_STR, "G28");
+PGMSTR(M21_STR, "M21");
+PGMSTR(M23_STR, "M23 %s");
+PGMSTR(M24_STR, "M24");
+PGMSTR(SP_P_STR, " P");  PGMSTR(SP_T_STR, " T");
+PGMSTR(X_STR,     "X");  PGMSTR(Y_STR,     "Y");  PGMSTR(Z_STR,     "Z");  PGMSTR(E_STR,     "E");
+PGMSTR(X_LBL,     "X:"); PGMSTR(Y_LBL,     "Y:"); PGMSTR(Z_LBL,     "Z:"); PGMSTR(E_LBL,     "E:");
+PGMSTR(SP_X_STR, " X");  PGMSTR(SP_Y_STR, " Y");  PGMSTR(SP_Z_STR, " Z");  PGMSTR(SP_E_STR, " E");
+PGMSTR(SP_X_LBL, " X:"); PGMSTR(SP_Y_LBL, " Y:"); PGMSTR(SP_Z_LBL, " Z:"); PGMSTR(SP_E_LBL, " E:");
 
 MarlinState marlin_state = MF_INITIALIZING;
 
@@ -245,11 +236,14 @@ I2CPositionEncodersMgr I2CPEM;
  * ***************************************************************************
  */
 
-void setup_killpin()
-{
-#if HAS_KILL
-  SET_INPUT_PULLUP(KILL_PIN);
-#endif
+void setup_killpin() {
+  #if HAS_KILL
+    #if KILL_PIN_STATE
+      SET_INPUT_PULLDOWN(KILL_PIN);
+    #else
+      SET_INPUT_PULLUP(KILL_PIN);
+    #endif
+  #endif
 }
 
 void setup_powerhold()
@@ -531,48 +525,45 @@ inline void manage_inactivity(const bool ignore_stepper_queue = false)
       already_shutdown_steppers = false;
   }
 
-#if PIN_EXISTS(CHDK) // Check if pin should be set to LOW (after M240 set it HIGH)
-  if (chdk_timeout && ELAPSED(ms, chdk_timeout))
-  {
-    chdk_timeout = 0;
-    WRITE(CHDK_PIN, LOW);
-  }
-#endif
+  #if PIN_EXISTS(CHDK) // Check if pin should be set to LOW (after M240 set it HIGH)
+    if (chdk_timeout && ELAPSED(ms, chdk_timeout)) {
+      chdk_timeout = 0;
+      WRITE(CHDK_PIN, LOW);
+    }
+  #endif
 
-#if HAS_KILL
+  #if HAS_KILL
 
-  // Check if the kill button was pressed and wait just in case it was an accidental
-  // key kill key press
-  // -------------------------------------------------------------------------------
-  static int killCount = 0; // make the inactivity button a bit less responsive
-  const int KILL_DELAY = 750;
-  if (!READ(KILL_PIN))
-    killCount++;
-  else if (killCount > 0)
-    killCount--;
+    // Check if the kill button was pressed and wait just in case it was an accidental
+    // key kill key press
+    // -------------------------------------------------------------------------------
+    static int killCount = 0;   // make the inactivity button a bit less responsive
+    const int KILL_DELAY = 750;
+    if (kill_state())
+      killCount++;
+    else if (killCount > 0)
+      killCount--;
 
-  // Exceeded threshold and we can confirm that it was not accidental
-  // KILL the machine
-  // ----------------------------------------------------------------
-  if (killCount >= KILL_DELAY)
-  {
-    SERIAL_ERROR_MSG(STR_KILL_BUTTON);
-    kill();
-  }
-#endif
+    // Exceeded threshold and we can confirm that it was not accidental
+    // KILL the machine
+    // ----------------------------------------------------------------
+    if (killCount >= KILL_DELAY) {
+      SERIAL_ERROR_MSG(STR_KILL_BUTTON);
+      kill();
+    }
+  #endif
 
-#if HAS_HOME
-  // Handle a standalone HOME button
-  constexpr millis_t HOME_DEBOUNCE_DELAY = 1000UL;
-  static millis_t next_home_key_ms; // = 0
-  if (!IS_SD_PRINTING() && !READ(HOME_PIN))
-  { // HOME_PIN goes LOW when pressed
-    const millis_t ms = millis();
-    if (ELAPSED(ms, next_home_key_ms))
-    {
-      next_home_key_ms = ms + HOME_DEBOUNCE_DELAY;
-      LCD_MESSAGEPGM(MSG_AUTO_HOME);
-      queue.enqueue_now_P(G28_STR);
+  #if HAS_HOME
+    // Handle a standalone HOME button
+    constexpr millis_t HOME_DEBOUNCE_DELAY = 1000UL;
+    static millis_t next_home_key_ms; // = 0
+    if (!IS_SD_PRINTING() && !READ(HOME_PIN)) { // HOME_PIN goes LOW when pressed
+      const millis_t ms = millis();
+      if (ELAPSED(ms, next_home_key_ms)) {
+        next_home_key_ms = ms + HOME_DEBOUNCE_DELAY;
+        LCD_MESSAGEPGM(MSG_AUTO_HOME);
+        queue.enqueue_now_P(G28_STR);
+      }
     }
   }
 #endif
@@ -866,13 +857,11 @@ void minkill(const bool steppers_off /*=false*/)
 
 #if HAS_KILL
 
-  // Wait for kill to be released
-  while (!READ(KILL_PIN))
-    watchdog_refresh();
+    // Wait for kill to be released
+    while (kill_state()) watchdog_refresh();
 
-  // Wait for kill to be pressed
-  while (READ(KILL_PIN))
-    watchdog_refresh();
+    // Wait for kill to be pressed
+    while (!kill_state()) watchdog_refresh();
 
   void (*resetFunc)() = 0; // Declare resetFunc() at address 0
   resetFunc();             // Jump to address 0
