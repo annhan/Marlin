@@ -159,6 +159,10 @@ bool G38_did_trigger; // = false
 #include "feature/runout.h"
 #endif
 
+#if ENABLED(HOTEND_IDLE_TIMEOUT)
+  #include "feature/hotend_idle.h"
+#endif
+
 #if ENABLED(TEMP_STAT_LEDS)
 #include "feature/leds/tempstat.h"
 #endif
@@ -576,52 +580,59 @@ inline void manage_inactivity(const bool ignore_stepper_queue = false)
 
   TERN_(AUTO_POWER_CONTROL, powerManager.check());
 
-#if ENABLED(EXTRUDER_RUNOUT_PREVENT)
-  if (thermalManager.degHotend(active_extruder) > EXTRUDER_RUNOUT_MINTEMP && ELAPSED(ms, gcode.previous_move_ms + SEC_TO_MS(EXTRUDER_RUNOUT_SECONDS)) && !planner.has_blocks_queued())
-  {
-#if ENABLED(SWITCHING_EXTRUDER)
-    bool oldstatus;
-    switch (active_extruder)
-    {
-    default:
-      oldstatus = E0_ENABLE_READ();
-      ENABLE_AXIS_E0();
-      break;
-#if E_STEPPERS > 1
-    case 2:
-    case 3:
-      oldstatus = E1_ENABLE_READ();
-      ENABLE_AXIS_E1();
-      break;
-#if E_STEPPERS > 2
-    case 4:
-    case 5:
-      oldstatus = E2_ENABLE_READ();
-      ENABLE_AXIS_E2();
-      break;
-#if E_STEPPERS > 3
-    case 6:
-    case 7:
-      oldstatus = E3_ENABLE_READ();
-      ENABLE_AXIS_E3();
-      break;
-#endif // E_STEPPERS > 3
-#endif // E_STEPPERS > 2
-#endif // E_STEPPERS > 1
-    }
-#else // !SWITCHING_EXTRUDER
-    bool oldstatus;
-    switch (active_extruder)
-    {
-    default:
-#define _CASE_EN(N)                   \
-  case N:                             \
-    oldstatus = E##N##_ENABLE_READ(); \
-    ENABLE_AXIS_E##N();               \
-    break;
-      REPEAT(E_STEPPERS, _CASE_EN);
-    }
-#endif
+  TERN_(HOTEND_IDLE_TIMEOUT, hotend_idle.check());
+
+  #if ENABLED(EXTRUDER_RUNOUT_PREVENT)
+    if (thermalManager.degHotend(active_extruder) > EXTRUDER_RUNOUT_MINTEMP
+      && ELAPSED(ms, gcode.previous_move_ms + SEC_TO_MS(EXTRUDER_RUNOUT_SECONDS))
+      && !planner.has_blocks_queued()
+    ) {
+      #if ENABLED(SWITCHING_EXTRUDER)
+        bool oldstatus;
+        switch (active_extruder) {
+          default: oldstatus = E0_ENABLE_READ(); ENABLE_AXIS_E0(); break;
+          #if E_STEPPERS > 1
+            case 2: case 3: oldstatus = E1_ENABLE_READ(); ENABLE_AXIS_E1(); break;
+            #if E_STEPPERS > 2
+              case 4: case 5: oldstatus = E2_ENABLE_READ(); ENABLE_AXIS_E2(); break;
+              #if E_STEPPERS > 3
+                case 6: case 7: oldstatus = E3_ENABLE_READ(); ENABLE_AXIS_E3(); break;
+              #endif // E_STEPPERS > 3
+            #endif // E_STEPPERS > 2
+          #endif // E_STEPPERS > 1
+        }
+      #else // !SWITCHING_EXTRUDER
+        bool oldstatus;
+        switch (active_extruder) {
+          default:
+          #define _CASE_EN(N) case N: oldstatus = E##N##_ENABLE_READ(); ENABLE_AXIS_E##N(); break;
+          REPEAT(E_STEPPERS, _CASE_EN);
+        }
+      #endif
+
+      const float olde = current_position.e;
+      current_position.e += EXTRUDER_RUNOUT_EXTRUDE;
+      line_to_current_position(MMM_TO_MMS(EXTRUDER_RUNOUT_SPEED));
+      current_position.e = olde;
+      planner.set_e_position_mm(olde);
+      planner.synchronize();
+
+      #if ENABLED(SWITCHING_EXTRUDER)
+        switch (active_extruder) {
+          default: oldstatus = E0_ENABLE_WRITE(oldstatus); break;
+          #if E_STEPPERS > 1
+            case 2: case 3: oldstatus = E1_ENABLE_WRITE(oldstatus); break;
+            #if E_STEPPERS > 2
+              case 4: case 5: oldstatus = E2_ENABLE_WRITE(oldstatus); break;
+            #endif // E_STEPPERS > 2
+          #endif // E_STEPPERS > 1
+        }
+      #else // !SWITCHING_EXTRUDER
+        switch (active_extruder) {
+          #define _CASE_RESTORE(N) case N: E##N##_ENABLE_WRITE(oldstatus); break;
+          REPEAT(E_STEPPERS, _CASE_RESTORE);
+        }
+      #endif // !SWITCHING_EXTRUDER
 
     const float olde = current_position.e;
     current_position.e += EXTRUDER_RUNOUT_EXTRUDE;

@@ -128,6 +128,10 @@ uint8_t Planner::delay_before_delivering;       // This counter delays delivery 
 
 planner_settings_t Planner::settings;           // Initialized by settings.load()
 
+#if ENABLED(LASER_POWER_INLINE)
+  laser_state_t Planner::laser;              // Current state for blocks
+#endif
+
 uint32_t Planner::max_acceleration_steps_per_s2[XYZE_N]; // (steps/s^2) Derived from mm_per_s2
 
 float Planner::steps_to_mm[XYZE_N];             // (mm) Millimeters per step
@@ -1799,8 +1803,8 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
   // Update block laser power
   #if ENABLED(LASER_POWER_INLINE)
-    block->laser.status = settings.laser.status;
-    block->laser.power = settings.laser.power;
+    block->laser.status = laser.status;
+    block->laser.power = laser.power;
   #endif
 
   // Number of steps for each axis
@@ -2453,16 +2457,16 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
       // Pick the smaller of the nominal speeds. Higher speed shall not be achieved at the junction during coasting.
       CACHED_SQRT(previous_nominal_speed, previous_nominal_speed_sqr);
 
-      vmax_junction = _MIN(nominal_speed, previous_nominal_speed);
+      float smaller_speed_factor = 1.0f;
+      if (nominal_speed < previous_nominal_speed) {
+        vmax_junction = nominal_speed;
+        smaller_speed_factor = vmax_junction / previous_nominal_speed;
+      }
+      else
+        vmax_junction = previous_nominal_speed;
 
       // Now limit the jerk in all axes.
-      const float smaller_speed_factor = vmax_junction / previous_nominal_speed;
-      #if HAS_LINEAR_E_JERK
-        LOOP_XYZ(axis)
-      #else
-        LOOP_XYZE(axis)
-      #endif
-      {
+      TERN(HAS_LINEAR_E_JERK, LOOP_XYZ, LOOP_XYZE)(axis) {
         // Limit an axis. We have to differentiate: coasting, reversal of an axis, full stop.
         float v_exit = previous_speed[axis] * smaller_speed_factor,
               v_entry = current_speed[axis];
@@ -2500,9 +2504,9 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     previous_safe_speed = safe_speed;
 
     #if HAS_JUNCTION_DEVIATION
-      vmax_junction_sqr = _MIN(vmax_junction_sqr, sq(vmax_junction));
+      NOMORE(vmax_junction_sqr, sq(vmax_junction));   // Throttle down to max speed
     #else
-      vmax_junction_sqr = sq(vmax_junction);
+      vmax_junction_sqr = sq(vmax_junction);          // Go up or down to the new speed
     #endif
 
   #endif // Classic Jerk Limiting
