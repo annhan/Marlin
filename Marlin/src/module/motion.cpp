@@ -869,7 +869,7 @@ FORCE_INLINE void mWork_SetPlan(millis_t &next_idle_ms) {
         #if ENABLED(SCARA_FEEDRATE_SCALING)
         , inv_duration
         #endif
-      )) break;
+      );
     }
     raw += segment_distance;
       planner.buffer_line(raw,  feedrate_mwork, active_extruder, cartesian_segment_mm
