@@ -210,7 +210,20 @@ void GcodeSuite::G28() {
 
   endstops.enable(true); // Enable endstops for next homing move
 
-    const bool homeX = parser.seen('X'), homeY = parser.seen('Y'), homeZ = parser.seen('Z'),
+  #if ENABLED(DELTA)
+
+    constexpr bool doZ = true; // for NANODLP_Z_SYNC if your DLP is on a DELTA
+
+    home_delta();
+
+    TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(slow_homing));
+
+  #else // NOT DELTA
+
+    const bool homeZ = parser.seen('Z'),
+               needX = homeZ && TERN0(Z_SAFE_HOMING, axes_need_homing(_BV(X_AXIS))),
+               needY = homeZ && TERN0(Z_SAFE_HOMING, axes_need_homing(_BV(Y_AXIS))),
+               homeX = needX || parser.seen('X'), homeY = needY || parser.seen('Y'),
                home_all = homeX == homeY && homeX == homeZ, // All or None
                doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ;
 
