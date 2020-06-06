@@ -140,6 +140,7 @@
  *  Z   Home to the Z endstop
  *
  */
+/*
 void GcodeSuite::G28() {
   if (DEBUGGING(LEVELING)) {
     DEBUG_ECHOLNPGM(">>> G28");
@@ -286,7 +287,8 @@ void GcodeSuite::G28() {
 
     #endif // Z_HOME_DIR < 0
 
-  sync_plan_position();
+    sync_plan_position();
+  #endif
   endstops.not_homing();
   restore_feedrate_and_scaling();
 
@@ -315,4 +317,299 @@ void GcodeSuite::G28() {
   report_current_position();
   if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
   if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< G28");
+}
+*/
+void GcodeSuite::G28() {
+  if (DEBUGGING(LEVELING)) {
+    DEBUG_ECHOLNPGM(">>> G28");
+    log_machine_info();
+  }
+
+  #if ENABLED(DUAL_X_CARRIAGE)
+    bool IDEX_saved_duplication_state = extruder_duplication_enabled;
+    DualXMode IDEX_saved_mode = dual_x_carriage_mode;
+  #endif
+
+  #if ENABLED(MARLIN_DEV_MODE)
+    if (parser.seen('S')) {
+      LOOP_XYZ(a) set_axis_is_at_home((AxisEnum)a);
+      sync_plan_position();
+      SERIAL_ECHOLNPGM("Simulated Homing");
+      report_current_position();
+      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< G28");
+      return;
+    }
+  #endif
+
+  // Home (O)nly if position is unknown
+  if (!homing_needed() && parser.boolval('O')) {
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("> homing not needed, skip\n<<< G28");
+    return;
+  }
+
+  // Wait for planner moves to finish!
+  planner.synchronize();
+
+  // Disable the leveling matrix before homing
+  #if HAS_LEVELING
+
+    // Cancel the active G29 session
+    TERN_(PROBE_MANUALLY, g29_in_progress = false);
+
+    TERN_(RESTORE_LEVELING_AFTER_G28, const bool leveling_was_active = planner.leveling_active);
+    set_bed_leveling_enabled(false);
+  #endif
+
+  TERN_(CNC_WORKSPACE_PLANES, workspace_plane = PLANE_XY);
+
+  #define HAS_CURRENT_HOME(N) (defined(N##_CURRENT_HOME) && N##_CURRENT_HOME != N##_CURRENT)
+  #if HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2)
+    #define HAS_HOMING_CURRENT 1
+  #endif
+
+  #if HAS_HOMING_CURRENT
+    auto debug_current = [](PGM_P const s, const int16_t a, const int16_t b){
+      serialprintPGM(s); DEBUG_ECHOLNPAIR(" current: ", a, " -> ", b);
+    };
+    #if HAS_CURRENT_HOME(X)
+      const int16_t tmc_save_current_X = stepperX.getMilliamps();
+      stepperX.rms_current(X_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("X"), tmc_save_current_X, X_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(X2)
+      const int16_t tmc_save_current_X2 = stepperX2.getMilliamps();
+      stepperX2.rms_current(X2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("X2"), tmc_save_current_X2, X2_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(Y)
+      const int16_t tmc_save_current_Y = stepperY.getMilliamps();
+      stepperY.rms_current(Y_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y"), tmc_save_current_Y, Y_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(Y2)
+      const int16_t tmc_save_current_Y2 = stepperY2.getMilliamps();
+      stepperY2.rms_current(Y2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y2"), tmc_save_current_Y2, Y2_CURRENT_HOME);
+    #endif
+  #endif
+
+  TERN_(IMPROVE_HOMING_RELIABILITY, slow_homing_t slow_homing = begin_slow_homing());
+
+  // Always home with tool 0 active
+  #if HAS_MULTI_HOTEND
+    #if DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE)
+      const uint8_t old_tool_index = active_extruder;
+    #endif
+    tool_change(0, true);
+  #endif
+
+  TERN_(HAS_DUPLICATION_MODE, extruder_duplication_enabled = false);
+
+  remember_feedrate_scaling_off();
+
+  endstops.enable(true); // Enable endstops for next homing move
+
+  #if ENABLED(DELTA)
+
+    constexpr bool doZ = true; // for NANODLP_Z_SYNC if your DLP is on a DELTA
+
+    home_delta();
+
+    TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(slow_homing));
+
+  #else // NOT DELTA
+
+    const bool homeZ = parser.seen('Z'),
+               needX = homeZ && TERN0(Z_SAFE_HOMING, axes_need_homing(_BV(X_AXIS))),
+               needY = homeZ && TERN0(Z_SAFE_HOMING, axes_need_homing(_BV(Y_AXIS))),
+               homeX = needX || parser.seen('X'), homeY = needY || parser.seen('Y'),
+               home_all = homeX == homeY && homeX == homeZ, // All or None
+               doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ;
+
+    destination = current_position;
+
+    #if Z_HOME_DIR > 0  // If homing away from BED do Z first
+
+      if (doZ) homeaxis(Z_AXIS);
+
+    #endif
+
+    const float z_homing_height =
+      (DISABLED(UNKNOWN_Z_NO_RAISE) || TEST(axis_known_position, Z_AXIS))
+        ? (parser.seenval('R') ? parser.value_linear_units() : Z_HOMING_HEIGHT)
+        : 0;
+
+    if (z_homing_height && (doX || doY || ENABLED(Z_SAFE_HOMING))) {
+      // Raise Z before homing any other axes and z is not already high enough (never lower z)
+      destination.z = z_homing_height + (TEST(axis_known_position, Z_AXIS) ? 0.0f : current_position.z);
+      if (destination.z > current_position.z) {
+        if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("Raise Z (before homing) to ", destination.z);
+        do_blocking_move_to_z(destination.z);
+      }
+    }
+
+    #if ENABLED(QUICK_HOME)
+
+      if (doX && doY) quick_home_xy();
+
+    #endif
+
+    // Home Y (before X)
+    if (ENABLED(HOME_Y_BEFORE_X) && (doY || (ENABLED(CODEPENDENT_XY_HOMING) && doX)))
+      homeaxis(Y_AXIS);
+
+    // Home X
+    if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) {
+
+      #if ENABLED(DUAL_X_CARRIAGE)
+
+        // Always home the 2nd (right) extruder first
+        active_extruder = 1;
+        homeaxis(X_AXIS);
+
+        // Remember this extruder's position for later tool change
+        inactive_extruder_x_pos = current_position.x;
+
+        // Home the 1st (left) extruder
+        active_extruder = 0;
+        homeaxis(X_AXIS);
+
+        // Consider the active extruder to be parked
+        raised_parked_position = current_position;
+        delayed_move_time = 0;
+        active_extruder_parked = true;
+
+      #else
+
+        homeaxis(X_AXIS);
+
+      #endif
+    }
+
+    // Home Y (after X)
+    if (DISABLED(HOME_Y_BEFORE_X) && doY)
+      homeaxis(Y_AXIS);
+
+    TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(slow_homing));
+
+    // Home Z last if homing towards the bed
+    #if Z_HOME_DIR < 0
+
+      if (doZ) {
+        TERN_(BLTOUCH, bltouch.init());
+
+        TERN(Z_SAFE_HOMING, home_z_safely(), homeaxis(Z_AXIS));
+
+        #if HOMING_Z_WITH_PROBE && defined(Z_AFTER_PROBING)
+          #if Z_AFTER_HOMING > Z_AFTER_PROBING
+            do_blocking_move_to_z(Z_AFTER_HOMING);
+          #else
+            probe.move_z_after_probing();
+          #endif
+        #elif defined(Z_AFTER_HOMING)
+          do_blocking_move_to_z(Z_AFTER_HOMING);
+        #endif
+
+      } // doZ
+
+    #endif // Z_HOME_DIR < 0
+
+    sync_plan_position();
+
+  #endif // !DELTA (G28)
+
+  /**
+   * Preserve DXC mode across a G28 for IDEX printers in DXC_DUPLICATION_MODE.
+   * This is important because it lets a user use the LCD Panel to set an IDEX Duplication mode, and
+   * then print a standard GCode file that contains a single print that does a G28 and has no other
+   * IDEX specific commands in it.
+   */
+  #if ENABLED(DUAL_X_CARRIAGE)
+
+    if (dxc_is_duplicating()) {
+
+      TERN_(IMPROVE_HOMING_RELIABILITY, slow_homing = begin_slow_homing());
+
+      // Always home the 2nd (right) extruder first
+      active_extruder = 1;
+      homeaxis(X_AXIS);
+
+      // Remember this extruder's position for later tool change
+      inactive_extruder_x_pos = current_position.x;
+
+      // Home the 1st (left) extruder
+      active_extruder = 0;
+      homeaxis(X_AXIS);
+
+      // Consider the active extruder to be parked
+      raised_parked_position = current_position;
+      delayed_move_time = 0;
+      active_extruder_parked = true;
+      extruder_duplication_enabled = IDEX_saved_duplication_state;
+      dual_x_carriage_mode         = IDEX_saved_mode;
+      stepper.set_directions();
+
+      TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(slow_homing));
+    }
+
+  #endif // DUAL_X_CARRIAGE
+
+  endstops.not_homing();
+
+  // Clear endstop state for polled stallGuard endstops
+  TERN_(SPI_ENDSTOPS, endstops.clear_endstop_state());
+
+  #if BOTH(DELTA, DELTA_HOME_TO_SAFE_ZONE)
+    // move to a height where we can use the full xy-area
+    do_blocking_move_to_z(delta_clip_start_height);
+  #endif
+
+  TERN_(RESTORE_LEVELING_AFTER_G28, set_bed_leveling_enabled(leveling_was_active));
+
+  restore_feedrate_and_scaling();
+
+  // Restore the active tool after homing
+  #if HAS_MULTI_HOTEND && (DISABLED(DELTA) || ENABLED(DELTA_HOME_TO_SAFE_ZONE))
+    tool_change(old_tool_index, NONE(PARKING_EXTRUDER, DUAL_X_CARRIAGE));   // Do move if one of these
+  #endif
+
+  #if HAS_HOMING_CURRENT
+    if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Restore driver current...");
+    #if HAS_CURRENT_HOME(X)
+      stepperX.rms_current(tmc_save_current_X);
+    #endif
+    #if HAS_CURRENT_HOME(X2)
+      stepperX2.rms_current(tmc_save_current_X2);
+    #endif
+    #if HAS_CURRENT_HOME(Y)
+      stepperY.rms_current(tmc_save_current_Y);
+    #endif
+    #if HAS_CURRENT_HOME(Y2)
+      stepperY2.rms_current(tmc_save_current_Y2);
+    #endif
+  #endif
+
+  ui.refresh();
+
+  report_current_position();
+
+  if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))
+    SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
+
+  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("<<< G28");
+
+  #if HAS_L64XX
+    // Set L6470 absolute position registers to counts
+    // constexpr *might* move this to PROGMEM.
+    // If not, this will need a PROGMEM directive and an accessor.
+    static constexpr AxisEnum L64XX_axis_xref[MAX_L64XX] = {
+      X_AXIS, Y_AXIS, Z_AXIS,
+      X_AXIS, Y_AXIS, Z_AXIS, Z_AXIS,
+      E_AXIS, E_AXIS, E_AXIS, E_AXIS, E_AXIS, E_AXIS
+    };
+    for (uint8_t j = 1; j <= L64XX::chain[0]; j++) {
+      const uint8_t cv = L64XX::chain[j];
+      L64xxManager.set_param((L64XX_axis_t)cv, L6470_ABS_POS, stepper.position(L64XX_axis_xref[cv]));
+    }
+  #endif
 }

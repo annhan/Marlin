@@ -1003,17 +1003,23 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
   void GcodeSuite::host_keepalive() {
     const millis_t ms = millis();
     static millis_t next_busy_signal_ms = 0;
+   
     if (!autoreport_paused && host_keepalive_interval && busy_state != NOT_BUSY) {
-      if (PENDING(ms, next_busy_signal_ms)) return;
+      /*SERIAL_ECHOPAIR("busy_state ", busy_state);
+      SERIAL_ECHOPAIR(" ms:", ms);
+      SERIAL_ECHOPAIR(" next_busy_signal_ms:", next_busy_signal_ms);
+      SERIAL_CHAR(" ddsd\n");*/
+     if (PENDING(ms, next_busy_signal_ms)) return;
+      //SERIAL_CHAR(" State\n");
       switch (busy_state) {
         case IN_HANDLER:
         case IN_PROCESS:
-		  #if ENABLED(mWorkProtocol)
-			SERIAL_CHAR("b ");
-			report_pos_step();
-		  #else
-			SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
-		  #endif
+          #if ENABLED(mWorkProtocol)
+            SERIAL_CHAR("b ");
+            report_pos_step();
+          #else
+            SERIAL_ECHO_MSG(STR_BUSY_PROCESSING);
+          #endif
           break;
         case PAUSED_FOR_USER:
           SERIAL_ECHO_MSG(STR_BUSY_PAUSED_FOR_USER);
@@ -1027,7 +1033,7 @@ void GcodeSuite::process_subcommands_now(char * gcode) {
     }
 	#if ENABLED(mWorkProtocol)
 	//	next_busy_signal_ms = ms + host_keepalive_interval * 200UL;
-    next_busy_signal_ms = ms + SEC_TO_MS(200);
+    next_busy_signal_ms = ms + SEC_TO_MS(0.3);
 	#else
     next_busy_signal_ms = ms + SEC_TO_MS(host_keepalive_interval);
 	#endif
