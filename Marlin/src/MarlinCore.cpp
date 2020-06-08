@@ -243,7 +243,17 @@ I2CPositionEncodersMgr I2CPEM;
  * ******************************** FUNCTIONS ********************************
  * ***************************************************************************
  */
-
+void mWork_initInOUT(){
+  bool status_begin = false;
+  OUT_WRITE(OUT2_PIN,status_begin);
+  OUT_WRITE(OUT5_PIN,status_begin);
+  OUT_WRITE(OUT6_PIN,status_begin);
+  OUT_WRITE(OUT66_PIN,status_begin);
+  OUT_WRITE(OUT67_PIN,status_begin);
+  OUT_WRITE(OUT68_PIN,status_begin);
+  OUT_WRITE(OUT69_PIN,status_begin);
+  OUT_WRITE(OUT70_PIN,status_begin);
+}
 void setup_killpin() {
   #if HAS_KILL
     #if KILL_PIN_STATE
@@ -1252,7 +1262,7 @@ void setup()
   #if ENABLED(DIRECT_STEPPING)
     SETUP_RUN(page_manager.init());
   #endif
-
+  mWork_initInOUT();
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");

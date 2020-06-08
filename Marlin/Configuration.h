@@ -21,7 +21,7 @@
  */
 #pragma once
 
-#define FAN1_PIN 9
+#define FAN1_PIN -1
 
 /**
  * Configuration.h

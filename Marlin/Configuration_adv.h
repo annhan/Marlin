@@ -2774,9 +2774,9 @@
  *
  * See https://marlinfw.org/docs/configuration/laser_spindle.html for more config details.
  */
-#define SPINDLE_LASER_ENA_PIN    4   // digital pin
+#define SPINDLE_LASER_ENA_PIN    8   // digital pin
 #define SPINDLE_LASER_PWM_PIN    7   // digital pin - MUST BE HARDWARE PWM
-#define SPINDLE_DIR_PIN          68   // digital pin
+#define SPINDLE_DIR_PIN          9   // digital pin
 #define SPINDLE_FEATURE
 //#define LASER_FEATURE
 #if EITHER(SPINDLE_FEATURE, LASER_FEATURE)

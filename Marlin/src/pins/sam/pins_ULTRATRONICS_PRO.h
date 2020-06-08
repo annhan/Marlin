@@ -125,16 +125,16 @@
 // Heaters / Fans
 //
 
-#define HEATER_0_PIN        3
-#define HEATER_1_PIN        8
-#define HEATER_2_PIN        7
-#define HEATER_3_PIN        9
-#define HEATER_BED_PIN      2
+#define HEATER_0_PIN        3 //3
+#define HEATER_1_PIN        -1 //8
+#define HEATER_2_PIN        -1 //7
+#define HEATER_3_PIN        -1 //9
+#define HEATER_BED_PIN      -1 //2
 
 #ifndef FAN_PIN
-  #define FAN_PIN                              6
+  #define FAN_PIN             -1 //6
 #endif
-#define FAN2_PIN                               5
+#define FAN2_PIN              -1 //5
 
 //
 // Misc. Functions
@@ -150,12 +150,12 @@
 
 //#define DAC0_SYNC                             53  // PB14
 //#define SPI_CHAN_DAC                           1
-
+/*
 #define SPI_CHAN_EEPROM1                      -1
 #define SPI_EEPROM1_CS                        -1
 #define SPI_EEPROM2_CS                        -1
 #define SPI_FLASH_CS                          -1
-
+*/
 // SPI for Max6675 or Max31855 Thermocouple
 /*
 #define MAX6675_SS_PIN                        65
@@ -186,20 +186,30 @@
 
 #define BEEPER_PIN      27
 
-#define IN54    54
-#define IN55    55
-#define IN56    56
-#define IN57    57
-#define IN58    58
-#define IN59    59
-#define IN4     4
-#define IN10    10
-#define IN53    53
-#define IN63    63
-#define IN64    64
+#define IN54_PIN    54
+#define IN55_PIN    55
+#define IN56_PIN    56
+#define IN57_PIN    57
+#define IN58_PIN    58
+#define IN59_PIN    59
+#define IN4_PIN     4
+#define IN10_PIN    10
+#define IN53_PIN    53
+#define IN63_PIN    63
+#define IN64_PIN    64
 
-#define OUT66 66
-#define OUT67 67
-#define OUT68 68
-#define OUT68 69
-#define OUT70 70
+#define OUT66_PIN   66
+#define OUT67_PIN   67
+#define OUT68_PIN   68
+#define OUT69_PIN   69
+#define OUT70_PIN   70
+#define OUT2_PIN    2
+#define OUT5_PIN    5
+#define OUT6_PIN    6
+/*
+
+//7,8,9 chay spindle
+#define OUT7_PIN    7 // Not using , dung cho Sprindle
+#define OUT8_PIN    8
+#define OUT9_PIN    9
+*/
