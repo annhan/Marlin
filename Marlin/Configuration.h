@@ -1164,8 +1164,8 @@
 #define MANUAL_Z_HOME_POS 0
 #define mWorkGoHome
 #if ENABLED(mWorkGoHome)
-  #define X_POS_HOME_DEGREE -30
-  #define Y_POS_HOME_DEGREE 135
+  #define THETA_ANGLE_AT_HOME -30
+  #define PSI_ANGLE_AT_HOME 135
 #endif
 // Homing speeds (mm/m)
 #define HOMING_FEEDRATE_XY (5*60)
