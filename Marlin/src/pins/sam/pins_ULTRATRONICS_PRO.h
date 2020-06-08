@@ -198,8 +198,10 @@
 #define IN63_PIN    63
 #define IN64_PIN    64
 
+//66,67 khong dung 
 #define OUT66_PIN   66
 #define OUT67_PIN   67
+
 #define OUT68_PIN   68
 #define OUT69_PIN   69
 #define OUT70_PIN   70

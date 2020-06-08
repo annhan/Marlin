@@ -94,6 +94,6 @@ void GcodeSuite::M42() {
   #endif
 
   pinMode(pin, OUTPUT);
-  extDigitalWrite(pin, pin_status);
+  //extDigitalWrite(pin, pin_status);
   analogWrite(pin, pin_status);
 }
