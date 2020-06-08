@@ -134,12 +134,7 @@ class Endstops {
     #if ENABLED(VALIDATE_HOMING_ENDSTOPS)
       // If the last move failed to trigger an endstop, call kill
       static void validate_homing_move();
-      #if IS_SCARA
-        static bool checkEndStop(){
-          if (trigger_state()) return true;
-          return false;
-        }
-      #endif
+      FORCE_INLINE static bool any() { return trigger_state() != 0; }
     #else
       FORCE_INLINE static void validate_homing_move() { hit_on_purpose(); }
     #endif

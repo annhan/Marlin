@@ -55,19 +55,15 @@
 #include "../../core/debug_out.h"
 
 #if ENABLED(QUICK_HOME)
-  #if IS_SCARA
-    extern Planner planner;
-    static void mWork_Home_EndStop(double _theta,double _psi,feedRate_t feedRate){
-      float e_tam = 0;
-      #if ENABLED(mWorkDebugGoHome)
-        SERIAL_ECHOPAIR("feedRate Go Home :", feedRate );
-        SERIAL_CHAR("\n");
-      #endif
-      uint8_t extruder = 0;
-      float mm = 360;
-      planner.buffer_segment(_theta, _psi, delta.c, e_tam, feedRate, extruder, mm);
-      millis_t time_end = millis() + 1000;
-      while (!endstops.checkEndStop()) {
+    #if IS_SCARA
+      extern Planner planner;
+      static void mWork_Home_EndStop(double _theta,double _psi,feedRate_t feedRate){
+        float e_tam = 0;
+        uint8_t extruder = 0;
+        float mm = 360;
+        planner.buffer_segment(_theta, _psi, delta.c, e_tam, feedRate, extruder, mm);
+        millis_t time_end = millis() + 1000;
+        while (!endstops.any()) {
           const millis_t ms = millis();
           if (ELAPSED(ms, time_end)) { // check
             time_end = ms + 1000;
@@ -76,51 +72,70 @@
             if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;
           }
           idle();
+        }
+        endstops.validate_homing_move();
       }
-     #if ENABLED(mWorkDEBUGProtocol)
-        SERIAL_CHAR("THOAT KHOI WIhLE LOOP \n");
-      #endif
-      endstops.validate_homing_move();
-    }
-    static void mWork_Set_Pos_Frome_angles(double A, double B){
-      forward_kinematics_SCARA(A,B);
-      current_position.set(cartes.x, cartes.y);
-      sync_plan_position();
-    }
-    static void quick_home_xy() {
-      mWork_Set_Pos_Frome_angles(0,0);
-      mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR,homing_feedrate(X_AXIS)); //Move Y 360 angles and wait endstop
-      mWork_Set_Pos_Frome_angles(0,0);
-      mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
-      mWork_Set_Pos_Frome_angles(X_POS_HOME_DEGREE,Y_POS_HOME_DEGREE);
-    }
+      static void mWork_Set_Pos_Frome_angles(double _theta, double _psi){
+        forward_kinematics_SCARA( _theta, _psi );
+        current_position.set(cartes.x, cartes.y);
+        sync_plan_position();
+      }
+      static void quick_home_xy() {
+        mWork_Set_Pos_Frome_angles(0,0);
+        mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
+        mWork_Set_Pos_Frome_angles(0,0); 
+        mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
+        mWork_Set_Pos_Frome_angles(THETA_ANGLE_AT_HOME,PSI_ANGLE_AT_HOME);  // Set Home position
+      }
   #else
-    static void quick_home_xy() {
-      current_position.set(0.0, 0.0);
-      #if ENABLED(mWorkDebugGoHome)
-        SERIAL_CHAR("QUICK_HOME SET HOME XY\n");
+  static void quick_home_xy() {
+
+    // Pretend the current position is 0,0
+    current_position.set(0.0, 0.0);  // Error with scara. x=0 y=0 -> theta = nul and psi = nul
+    sync_plan_position();
+
+    const int x_axis_home_dir = x_home_dir(active_extruder);
+
+    const float mlx = max_length(X_AXIS),
+                mly = max_length(Y_AXIS),
+                mlratio = mlx > mly ? mly / mlx : mlx / mly,
+                fr_mm_s = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)) * SQRT(sq(mlratio) + 1.0);
+
+    #if ENABLED(SENSORLESS_HOMING)
+      sensorless_t stealth_states {
+          tmc_enable_stallguard(stepperX)
+        , tmc_enable_stallguard(stepperY)
+        , false
+        , false
+          #if AXIS_HAS_STALLGUARD(X2)
+            || tmc_enable_stallguard(stepperX2)
+          #endif
+        , false
+          #if AXIS_HAS_STALLGUARD(Y2)
+            || tmc_enable_stallguard(stepperY2)
+          #endif
+      };
+    #endif
+
+    do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * home_dir(Y_AXIS), fr_mm_s);
+
+    endstops.validate_homing_move();
+
+    current_position.set(0.0, 0.0);
+
+    #if ENABLED(SENSORLESS_HOMING)
+      tmc_disable_stallguard(stepperX, stealth_states.x);
+      tmc_disable_stallguard(stepperY, stealth_states.y);
+      #if AXIS_HAS_STALLGUARD(X2)
+        tmc_disable_stallguard(stepperX2, stealth_states.x2);
       #endif
-      sync_plan_position();
-      const int x_axis_home_dir = x_home_dir(active_extruder);
-      const float mlx = max_length(X_AXIS),
-                  mly = max_length(Y_AXIS),
-                  mlratio = mlx > mly ? mly / mlx : mlx / mly,
-                  fr_mm_s = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)) * SQRT(sq(mlratio) + 1.0);
-      #if ENABLED(mWorkDebugGoHome)
-        SERIAL_ECHOPAIR("max LENGH x :", mlx );
-        SERIAL_ECHOPAIR(" Y :", mly );
-        SERIAL_CHAR("\n");
+      #if AXIS_HAS_STALLGUARD(Y2)
+        tmc_disable_stallguard(stepperY2, stealth_states.y2);
       #endif
-      do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * home_dir(Y_AXIS), fr_mm_s);
-      endstops.validate_homing_move();
-      current_position.set(0.0, 0.0);
-    }
-  
+    #endif
+  }
   #endif
-  #endif // QUICK_HOME
-
-
-
+#endif // QUICK_HOME
 /**
  * G28: Home all axes according to settings
  *

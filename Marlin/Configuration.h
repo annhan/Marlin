@@ -167,7 +167,6 @@
 #ifndef MOTHERBOARD
   #define MOTHERBOARD BOARD_ULTRATRONICS_PRO
 #endif
-
 // Name displayed in the LCD "Ready" message and Info menu
 //#define CUSTOM_MACHINE_NAME "mWork"
 
