@@ -53,13 +53,12 @@ M226 Wait input Pin: 54,55,56,57,58, 4,10,53,63,64    VD M226 P55 S0
 
 3. PIN Modify
 ```
- 54 PIN protectiom check lai ->PIN A0 là TEMP_0_PIN
+ - 54 PIN protectiom check lai ->PIN A0 là TEMP_0_PIN
  Đổi TEMP_0_PIN thanh 8 là A8
-
- Pin 3 trong M42 là Pin default của HEATER_0_PIN
+ - Pin 3 trong M42 là Pin default của HEATER_0_PIN
  đổi HEATER_0_PIN  thành D47 là Step7 Not using
  ```
 
  ```
- PIN 66,67 trong OUTPUT là PIn DAC0,1 hiện chưa hoạt động được.
+ - PIN 66,67 trong OUTPUT là PIn DAC0,1 hiện chưa hoạt động được.
  ```
