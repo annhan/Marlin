@@ -19,10 +19,23 @@ void report_pos_step(){
 	report_current_position();
 }
 ```
+## PIN IN OUT
 ```
-M42 Dieu Khien Ngo OUT : 68,69,70,5,6,2,3  VD: M42 P68 S255
+M42 Dieu Khien Ngo OUT : 68,69,70,7,8,9,2  VD: M42 P68 S255
 M226 Wait input Pin: 54,55,56,57,58, 4,10,53,63,64    VD M226 P55 S0
 ```   
+```
+- PWM PED label -> PIN 2
+- E2 Label -> PIN 7
+- E1 label -> PIN 8
+- E3 label -> PIN 9
+
+- E0 label -> PIN 3 ->using sprindle ENB
+- FAN 2 label -> PIN 5 ->using sprindle DIR
+- FAN 1 Label -> PIN 6 ->using sprindle PWM
+```
+
+
 ```
  54 PIN protectiom check lai ->PIN A0 là TEMP_0_PIN
  Đổi TEMP_0_PIN thanh 8 là A8
