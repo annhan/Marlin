@@ -47,8 +47,8 @@ void GcodeSuite::M42() {
   const pin_t pin = GET_PIN_MAP_PIN(pin_index);
 
   if (!parser.boolval('I') && pin_is_protected(pin)) return protected_pin_err();
-  SERIAL_ECHOPAIR("Pin ", pin);
-  SERIAL_CHAR("\n");
+  //SERIAL_ECHOPAIR("Pin ", pin);
+  //SERIAL_CHAR("\n");
   if (parser.seenval('M')) {
     switch (parser.value_byte()) {
       case 0: pinMode(pin, INPUT); break;

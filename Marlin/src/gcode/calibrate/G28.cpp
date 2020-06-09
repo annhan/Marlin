@@ -470,12 +470,17 @@ void GcodeSuite::G28() {
     #endif
 
     // Home Y (before X)
-    if (ENABLED(HOME_Y_BEFORE_X) && (doY || (ENABLED(CODEPENDENT_XY_HOMING) && doX)))
+    if (ENABLED(HOME_Y_BEFORE_X) && (doY || (ENABLED(CODEPENDENT_XY_HOMING) && doX))){
+            //SERIAL_ECHOPAIR("Pin ", pin);
+      SERIAL_CHAR("HOME Y\n");
       homeaxis(Y_AXIS);
+    }
+      
 
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) {
-
+      //SERIAL_ECHOPAIR("Pin ", pin);
+      SERIAL_CHAR("HOME X\n");
       #if ENABLED(DUAL_X_CARRIAGE)
 
         // Always home the 2nd (right) extruder first
@@ -502,8 +507,12 @@ void GcodeSuite::G28() {
     }
 
     // Home Y (after X)
-    if (DISABLED(HOME_Y_BEFORE_X) && doY)
+    if (DISABLED(HOME_Y_BEFORE_X) && doY){
+       //SERIAL_ECHOPAIR("Pin ", pin);
+      SERIAL_CHAR("HOME Y SAU X 1\n");
       homeaxis(Y_AXIS);
+    }
+      
 
     TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(slow_homing));
 
@@ -514,7 +523,8 @@ void GcodeSuite::G28() {
         TERN_(BLTOUCH, bltouch.init());
 
         TERN(Z_SAFE_HOMING, home_z_safely(), homeaxis(Z_AXIS));
-
+          //SERIAL_ECHOPAIR("Pin ", pin);
+        SERIAL_CHAR("HOME Z\n");
         #if HOMING_Z_WITH_PROBE && defined(Z_AFTER_PROBING)
           #if Z_AFTER_HOMING > Z_AFTER_PROBING
             do_blocking_move_to_z(Z_AFTER_HOMING);
