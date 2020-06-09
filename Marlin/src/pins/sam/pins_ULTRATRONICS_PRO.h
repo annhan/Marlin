@@ -115,7 +115,7 @@
 // Temperature Sensors
 //
 
-#define TEMP_0_PIN          0   // Analog Input
+#define TEMP_0_PIN          8   // Analog Input
 //#define TEMP_1_PIN          2   // Analog Input
 ////#define TEMP_2_PIN          3   // Analog Input
 //#define TEMP_3_PIN          4   // Analog Input
@@ -125,7 +125,7 @@
 // Heaters / Fans
 //
 
-#define HEATER_0_PIN        3 //3
+#define HEATER_0_PIN        47 //3
 #define HEATER_1_PIN        -1 //8
 #define HEATER_2_PIN        -1 //7
 #define HEATER_3_PIN        -1 //9
