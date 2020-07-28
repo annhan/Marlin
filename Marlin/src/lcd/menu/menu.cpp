@@ -16,7 +16,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  */
 
@@ -61,7 +61,8 @@ typedef struct {
 menuPosition screen_history[6];
 uint8_t screen_history_depth = 0;
 
-uint8_t MenuItemBase::itemIndex;  // Index number for draw and action
+int8_t MenuItemBase::itemIndex;   // Index number for draw and action
+PGM_P MenuItemBase::itemString;   // A PSTR for substitution
 chimera_t editable;               // Value Editing
 
 // Menu Edit Items
@@ -84,9 +85,8 @@ void MarlinUI::save_previous_screen() {
 }
 
 void MarlinUI::_goto_previous_screen(TERN_(TURBO_BACK_MENU_ITEM, const bool is_back/*=false*/)) {
-  #if DISABLED(TURBO_BACK_MENU_ITEM)
-    constexpr bool is_back = false;
-  #endif
+  TERN(TURBO_BACK_MENU_ITEM,,constexpr bool is_back = false);
+  TERN_(TOUCH_BUTTONS, on_edit_screen = false);
   if (screen_history_depth > 0) {
     menuPosition &sh = screen_history[--screen_history_depth];
     goto_screen(sh.menu_function,
@@ -155,6 +155,7 @@ void MenuEditItemBase::goto_edit_screen(
   const screenFunc_t cb,  // Callback after edit
   const bool le           // Flag to call cb() during editing
 ) {
+  TERN_(TOUCH_BUTTONS, ui.on_edit_screen = true);
   ui.screen_changed = true;
   ui.save_previous_screen();
   ui.refresh();
@@ -185,6 +186,7 @@ DEFINE_MENU_EDIT_ITEM(float43);     // 1.234
 DEFINE_MENU_EDIT_ITEM(float5);      // 12345      right-justified
 DEFINE_MENU_EDIT_ITEM(float5_25);   // 12345      right-justified (25 increment)
 DEFINE_MENU_EDIT_ITEM(float51);     // 1234.5     right-justified
+DEFINE_MENU_EDIT_ITEM(float31sign); // +12.3
 DEFINE_MENU_EDIT_ITEM(float41sign); // +123.4
 DEFINE_MENU_EDIT_ITEM(float51sign); // +1234.5
 DEFINE_MENU_EDIT_ITEM(float52sign); // +123.45
@@ -230,7 +232,7 @@ void MarlinUI::goto_screen(screenFunc_t screen, const uint16_t encoder/*=0*/, co
           screen = TERN(BABYSTEP_ZPROBE_OFFSET, lcd_babystep_zoffset, lcd_babystep_z);
         else {
           #if ENABLED(MOVE_Z_WHEN_IDLE)
-            move_menu_scale = MOVE_Z_IDLE_MULTIPLICATOR;
+            ui.manual_move.menu_scale = MOVE_Z_IDLE_MULTIPLICATOR;
             screen = lcd_move_z;
           #endif
         }
@@ -343,7 +345,7 @@ void scroll_screen(const uint8_t limit, const bool is_menu) {
     ui.defer_status_screen();
     const bool do_probe = DISABLED(BABYSTEP_HOTEND_Z_OFFSET) || active_extruder == 0;
     if (ui.encoderPosition) {
-      const int16_t babystep_increment = int16_t(ui.encoderPosition) * (BABYSTEP_MULTIPLICATOR_Z);
+      const int16_t babystep_increment = int16_t(ui.encoderPosition) * (BABYSTEP_SIZE_Z);
       ui.encoderPosition = 0;
 
       const float diff = planner.steps_to_mm[Z_AXIS] * babystep_increment,
