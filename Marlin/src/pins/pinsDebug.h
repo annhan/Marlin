@@ -203,7 +203,7 @@ const PinInfo pin_array[] PROGMEM = {
 #endif
 
 static void print_input_or_output(const bool isout) {
-  serialprintPGM(isout ? PSTR("Output = ") : PSTR("Input  = "));
+  serialprintPGM(isout ? PSTR("O=") : PSTR("I="));
 }
 
 // pretty report with PWM info
@@ -283,9 +283,10 @@ inline void report_pin_state_extended(pin_t pin, const bool ignore, const bool e
 
   if (!found) {
     if (start_string) serialprintPGM(start_string);
-    serialprintPGM(PSTR("PIN: "));
+    serialprintPGM(PSTR("PIN:"));
     PRINT_PIN(pin);
     PRINT_PORT(pin);
+    /*
     if (int8_t(DIGITAL_PIN_TO_ANALOG_PIN(pin)) >= 0) {
       sprintf_P(buffer, PSTR(" (A%2d)  "), DIGITAL_PIN_TO_ANALOG_PIN(pin));    // analog pin number
       SERIAL_ECHO(buffer);
@@ -293,6 +294,7 @@ inline void report_pin_state_extended(pin_t pin, const bool ignore, const bool e
     else
       SERIAL_ECHO_SP(8);   // add padding if not an analog pin
     SERIAL_ECHOPGM("<unused/unknown>");
+    */
     if (extended) {
 
       if (alt_pin_echo(pin)) {
@@ -305,15 +307,16 @@ inline void report_pin_state_extended(pin_t pin, const bool ignore, const bool e
           SERIAL_ECHO(digitalRead_mod(pin));
         }
         else {
-          if (IS_ANALOG(pin)) {
+          /*if (IS_ANALOG(pin)) {
             sprintf_P(buffer, PSTR("   Analog in = %5ld"), (long)analogRead(DIGITAL_PIN_TO_ANALOG_PIN(pin)));
             SERIAL_ECHO(buffer);
             SERIAL_ECHOPGM("   ");
           }
           else
           SERIAL_ECHO_SP(MAX_NAME_LENGTH - 16);   // add padding if not an analog pin
-
-          print_input_or_output(false);
+          */
+         // print_input_or_output(false);
+          serialprintPGM(PSTR(" IN="));
           SERIAL_ECHO(digitalRead_mod(pin));
         }
         //if (!pwm_status(pin)) SERIAL_CHAR(' ');    // add padding if it's not a PWM pin
