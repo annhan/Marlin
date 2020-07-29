@@ -83,7 +83,7 @@
 //
 #if EITHER(MORGAN_SCARA, MP_SCARA)
   // If movement is choppy try lowering this value
-  #define SCARA_SEGMENTS_PER_SECOND 1000
+  #define SCARA_SEGMENTS_PER_SECOND 500
   // Length of inner and outer support arms. Measure arm lengths precisely.
   #define SCARA_LINKAGE_1  430    // (mm)
   #define SCARA_LINKAGE_2  230    // (mm)
@@ -783,7 +783,8 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define STEPS_PER_DEGREE (1.0 * 200 * 128 * 5 / 360.0)
+//#define STEPS_PER_DEGREE (1.0 * 200 * 128 * 5 / 360.0)
+#define STEPS_PER_DEGREE (1.0 * 16384 * 6 / 360.0)
 #define Z_STEPS_PER_MM   (1.0 * 200 * 32 * 5 / 15   ) //15 LÀ (1/3)/5
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {STEPS_PER_DEGREE, STEPS_PER_DEGREE, Z_STEPS_PER_MM,500}
 //#define DEFAULT_AXIS_STEPS_PER_UNIT   { 80, 80, 4000, 500 }
@@ -793,7 +794,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 150000, 150000,10000, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 15000, 15000,10000, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -821,9 +822,9 @@
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          2000    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
 #define DEFAULT_RETRACT_ACCELERATION  2000    // E acceleration for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   200    // X, Y, Z acceleration for travel (non printing) moves
+#define DEFAULT_TRAVEL_ACCELERATION   3000    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk limits (mm/s)
@@ -870,7 +871,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-//#define S_CURVE_ACCELERATION
+#define S_CURVE_ACCELERATION
 
 //===========================================================================
 //============================= Z Probe Options =============================

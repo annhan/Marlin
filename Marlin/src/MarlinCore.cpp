@@ -515,11 +515,9 @@ inline void finishSDPrinting()
  *  - Check if an idle but hot extruder needs filament extruded (EXTRUDER_RUNOUT_PREVENT)
  *  - Pulse FET_SAFETY_PIN if it exists
  */
-inline void manage_inactivity(const bool ignore_stepper_queue = false)
-{
+inline void manage_inactivity(const bool ignore_stepper_queue=false) {
 
-  if (queue.length < BUFSIZE)
-    queue.get_available_commands();
+  if (queue.length < BUFSIZE) queue.get_available_commands();
 
   const millis_t ms = millis();
 
@@ -603,8 +601,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue = false)
         queue.enqueue_now_P(G28_STR);
       }
     }
-  }
-#endif
+  #endif
 
   TERN_(USE_CONTROLLER_FAN, controllerFan.update()); // Check if fan should be turned on to cool stepper drivers down
 
@@ -666,20 +663,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue = false)
 
       gcode.reset_stepper_timeout(ms);
     }
-#else // !SWITCHING_EXTRUDER
-    switch (active_extruder)
-    {
-#define _CASE_RESTORE(N)            \
-  case N:                           \
-    E##N##_ENABLE_WRITE(oldstatus); \
-    break;
-      REPEAT(E_STEPPERS, _CASE_RESTORE);
-    }
-#endif // !SWITCHING_EXTRUDER
-
-    gcode.reset_stepper_timeout();
-  }
-#endif // EXTRUDER_RUNOUT_PREVENT
+  #endif // EXTRUDER_RUNOUT_PREVENT
 
 #if ENABLED(DUAL_X_CARRIAGE)
   // handle delayed move timeout
