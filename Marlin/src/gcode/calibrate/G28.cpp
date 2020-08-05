@@ -62,11 +62,43 @@
 #include "../../core/debug_out.h"
 
 #if ENABLED(QUICK_HOME)
-
+    #if IS_SCARA
+      extern Planner planner;
+      static void mWork_Home_EndStop(double _theta,double _psi,feedRate_t feedRate){
+        float e_tam = 0;
+        uint8_t extruder = 0;
+        float mm = 360;
+        planner.buffer_segment(_theta, _psi, delta.c, e_tam, feedRate, extruder, mm);
+        millis_t time_end = millis() + 1000;
+        while (!endstops.any()) {
+          const millis_t ms = millis();
+          if (ELAPSED(ms, time_end)) { // check
+            time_end = ms + 1000;
+            const float x_tam = planner.get_axis_position_degrees(A_AXIS),
+                        y_tam = planner.get_axis_position_degrees(B_AXIS);
+            if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;
+          }
+          idle();
+        }
+        endstops.validate_homing_move();
+      }
+      static void mWork_Set_Pos_Frome_angles(double _theta, double _psi){
+        forward_kinematics_SCARA( _theta, _psi );
+        current_position.set(cartes.x, cartes.y);
+        sync_plan_position();
+      }
+      static void quick_home_xy() {
+        mWork_Set_Pos_Frome_angles(0,0);
+        mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
+        mWork_Set_Pos_Frome_angles(0,0); 
+        mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
+        mWork_Set_Pos_Frome_angles(THETA_ANGLE_AT_HOME,PSI_ANGLE_AT_HOME);  // Set Home position
+      }
+  #else
   static void quick_home_xy() {
 
     // Pretend the current position is 0,0
-    current_position.set(0.0, 0.0);
+    current_position.set(0.0, 0.0);  // Error with scara. x=0 y=0 -> theta = nul and psi = nul
     sync_plan_position();
 
     const int x_axis_home_dir = x_home_dir(active_extruder);
@@ -109,7 +141,7 @@
       #endif
     #endif
   }
-
+  #endif
 #endif // QUICK_HOME
 
 #if ENABLED(Z_SAFE_HOMING)
