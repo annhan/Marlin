@@ -115,9 +115,11 @@
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                           3
-#define HEATER_1_PIN                           8
-#define HEATER_2_PIN                           7
+#define SPINDLE_LASER_ENA_PIN                  7
+#define SPINDLE_LASER_PWM_PIN                  8
+#define HEATER_0_PIN                           3  //3
+#define HEATER_1_PIN                           -1  //8
+#define HEATER_2_PIN                           -1 //7
 #define HEATER_3_PIN                           9
 #define HEATER_BED_PIN                         2
 

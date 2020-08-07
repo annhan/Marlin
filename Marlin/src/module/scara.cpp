@@ -130,7 +130,7 @@ void inverse_kinematics(const xyz_pos_t &raw) {
     // Angle of Arm2
     PSI = ATAN2(S2, C2);
 
-    delta.set(DEGREES(THETA), DEGREES(THETA + PSI), raw.z);
+    delta.set(DEGREES(THETA), DEGREES(PSI), raw.z);
 
     /*
       DEBUG_POS("SCARA IK", raw);

@@ -89,7 +89,7 @@
       }
       static void quick_home_xy() {
         mWork_Set_Pos_Frome_angles(0,0);
-        mWork_Home_EndStop(360.0 * X_HOME_DIR,360.0* X_HOME_DIR,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
+        mWork_Home_EndStop(360.0 * X_HOME_DIR,0,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
         mWork_Set_Pos_Frome_angles(0,0); 
         mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
         mWork_Set_Pos_Frome_angles(THETA_ANGLE_AT_HOME,PSI_ANGLE_AT_HOME);  // Set Home position
