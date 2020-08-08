@@ -1,124 +1,183 @@
-# Marlin 3D Printer Firmware
+# Read The Docs Theme for Jekyll and GitHub Pages
 
-![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)
-![GitHub contributors](https://img.shields.io/github/contributors/marlinfirmware/marlin.svg)
-![GitHub Release Date](https://img.shields.io/github/release-date/marlinfirmware/marlin.svg)
-[![Build Status](https://github.com/MarlinFirmware/Marlin/workflows/CI/badge.svg?branch=bugfix-2.0.x)](https://github.com/MarlinFirmware/Marlin/actions)
+Port of the Read the Docs theme to Jekyll that can be used with GitHub Pages.
 
-<img align="right" width=175 src="buildroot/share/pixmaps/logo/marlin-250.png" />
+You can preview it in the
+[user documentation](https://carlosperate.github.io/jekyll-theme-rtd):
 
-Additional documentation can be found at the [Marlin Home Page](https://marlinfw.org/).
-Please test this firmware and let us know if it misbehaves in any way. Volunteers are standing by!
+![theme screenshot](docs/assets/img/screenshot.png)
 
-## Marlin 2.0 Bugfix Branch
+The original [Read The Docs](https://sphinx-rtd-theme.readthedocs.io)
+theme was created for [Sphinx](https://www.sphinx-doc.org/), and so it is
+designed specifically for documentation.
 
-__Not for production use. Use with caution!__
+Combined with [GitHub Pages](https://pages.github.com) it's a great and easy
+way to document your projects!
 
-Marlin 2.0 takes this popular RepRap firmware to the next level by adding support for much faster 32-bit and ARM-based boards while improving support for 8-bit AVR boards. Read about Marlin's decision to use a "Hardware Abstraction Layer" below.
+Check out the [quick start guide]() to see how easy it is to 
 
-This branch is for patches to the latest 2.0.x release version. Periodically this branch will form the basis for the next minor 2.0.x release.
+### 🚧 Warning!
 
-Download earlier versions of Marlin on the [Releases page](https://github.com/MarlinFirmware/Marlin/releases).
+This theme is currently a **Work-In-Progress** but, while some things might be
+broken, it should be already usable.
 
-## Building Marlin 2.0
+Missing features are listed in the GitHub issues with the
+[to-do label](https://github.com/carlosperate/jekyll-theme-rtd/issues?q=is%3Aissue+is%3Aopen+label%3Ato-do),
+and any known issues are listed with the
+[bug label](https://github.com/carlosperate/jekyll-theme-rtd/issues?q=is%3Aissue+is%3Aopen+label%3Abug).
 
-To build Marlin 2.0 you'll need [Arduino IDE 1.8.8 or newer](https://www.arduino.cc/en/main/software) or [PlatformIO](https://docs.platformio.org/en/latest/ide.html#platformio-ide). We've posted detailed instructions on [Building Marlin with Arduino](https://marlinfw.org/docs/basics/install_arduino.html) and [Building Marlin with PlatformIO for ReArm](https://marlinfw.org/docs/basics/install_rearm.html) (which applies well to other 32-bit boards).
+Contributions are very welcomed!
 
-## Hardware Abstraction Layer (HAL)
 
-Marlin 2.0 introduces a layer of abstraction so that all the existing high-level code can be built for 32-bit platforms while still retaining full 8-bit AVR compatibility. Retaining AVR compatibility and a single code-base is important to us, because we want to make sure that features and patches get as much testing and attention as possible, and that all platforms always benefit from the latest improvements.
+## 🗂️ Readme Contents
 
-### Current HALs
+This README contains mostly the developer documentation to edit this theme.
 
-  #### AVR (8-bit)
+To learn how to use this theme for your own website or docs check out the
+[user documentation](https://carlosperate.github.io/jekyll-theme-rtd).
 
-  board|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino AVR](https://www.arduino.cc/)|ATmega, ATTiny, etc.|16-20MHz|64-256k|2-16k|5V|no
+- [🚀 Using this theme with GitHub Pages](#-using-this-theme-with-github-pages)
+- [👩‍💻 Developer Documentation](#-developer-documentation)
+    - [Run in a virtual machine with Vagrant](#run-in-a-virtual-machine-with-vagrant)
+    - [Run locally with Ruby](#run-locally-with-ruby)
+    - [Build the docs using the remote theme](#build-the-docs-using-the-remote-theme)
+    - [Build the docs with MkDocs for comparison](#build-the-docs-with-mkdocs-for-comparison)
+- [👨‍👩‍👧‍👦 Contributing](#-contributing)
+- [⚖️ License](#%EF%B8%8F-license)
 
-  #### DUE
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino Due](https://www.arduino.cc/en/Guide/ArduinoDue), [RAMPS-FD](https://www.reprap.org/wiki/RAMPS-FD), etc.|[SAM3X8E ARM-Cortex M3](https://www.microchip.com/wwwproducts/en/ATsam3x8e)|84MHz|512k|64+32k|3.3V|no
+## 🚀 Using this theme with GitHub Pages
 
-  #### ESP32
+The fastest way to use this theme is with GitHub Pages, check out the
+[Quick Start Guide from the user documentation](https://carlosperate.github.io/jekyll-theme-rtd/quickstart.html).
 
-  board|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [ESP32](https://www.espressif.com/en/products/hardware/esp32/overview)|Tensilica Xtensa LX6|240MHz|---|---|3.3V|---
+## 👩‍💻 Developer Documentation
 
-  #### LPC1768 / LPC1769
+These instructions describe two different ways to to set up your environment to
+develop or edit this theme.
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Re-ARM](https://www.kickstarter.com/projects/1245051645/re-arm-for-ramps-simple-32-bit-upgrade)|[LPC1768 ARM-Cortex M3](https://www.nxp.com/products/microcontrollers-and-processors/arm-based-processors-and-mcus/lpc-cortex-m-mcus/lpc1700-cortex-m3/512kb-flash-64kb-sram-ethernet-usb-lqfp100-package:LPC1768FBD100)|100MHz|512k|32+16+16k|3.3-5V|no
-  [MKS SBASE](https://reprap.org/forum/read.php?13,499322)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Selena Compact](https://github.com/Ales2-k/Selena)|LPC1768 ARM-Cortex M3|100MHz|512k|32+16+16k|3.3-5V|no
-  [Azteeg X5 GT](https://www.panucatt.com/azteeg_X5_GT_reprap_3d_printer_controller_p/ax5gt.htm)|LPC1769 ARM-Cortex M3|120MHz|512k|32+16+16k|3.3-5V|no
-  [Smoothieboard](https://reprap.org/wiki/Smoothieboard)|LPC1769 ARM-Cortex M3|120MHz|512k|64k|3.3-5V|no
+The theme is developed like a normal Jekyll site, and it can serve the
+documentation using the theme source code located here.
 
-  #### SAMD51
+### Run in a virtual machine with Vagrant
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Adafruit Grand Central M4](https://www.adafruit.com/product/4064)|[SAMD51P20A ARM-Cortex M4](https://www.microchip.com/wwwproducts/en/ATSAMD51P20A)|120MHz|1M|256k|3.3V|yes
+[Vagrant](https://www.vagrantup.com) provides an easy way to set up and manage
+a Virtual Machine with [VirtualBox](https://www.virtualbox.org). With a single
+command you can automatically create the VM with all the dependencies required
+to build and sever this project.
 
-  #### STM32F1
+There is a [Vagrantfile](Vagrantfile) included to run an Ubuntu VM with Ruby
+and Jekyll. To set-up everything and serve the website run:
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Arduino STM32](https://github.com/rogerclarkmelbourne/Arduino_STM32)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
-  [Geeetech3D GTM32](https://github.com/Geeetech3D/Diagram/blob/master/Rostock301/Hardware_GTM32_PRO_VB.pdf)|[STM32F1](https://www.st.com/en/microcontrollers-microprocessors/stm32f103.html) ARM-Cortex M3|72MHz|256-512k|48-64k|3.3V|no
+```bash
+$ vagrant up
+```
 
-  #### STM32F4
+The first time you run this command it will take a bit longer, as it downloads
+and installs everything. Subsequent runs will be much quicker.
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [STEVAL-3DP001V1](https://www.st.com/en/evaluation-tools/steval-3dp001v1.html)|[STM32F401VE Arm-Cortex M4](https://www.st.com/en/microcontrollers-microprocessors/stm32f401ve.html)|84MHz|512k|64+32k|3.3-5V|yes
+This will serve the website at [http://localhost:4000](http://localhost:4000)
+with a hot-reload enabled, so any changes made on these files will trigger a
+rebuild.
 
-  #### Teensy++ 2.0
+#### Other Vagrant commands
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy++ 2.0](https://www.microchip.com/wwwproducts/en/AT90USB1286)|[AT90USB1286](https://www.microchip.com/wwwproducts/en/AT90USB1286)|16MHz|128k|8k|5V|no
+To stop the virtual machine first press `Ctrl+C` to end the Jekyll process and
+execute in your terminal:
 
-  #### Teensy 3.1 / 3.2
+```
+$ vagrant halt
+```
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy 3.2](https://www.pjrc.com/store/teensy32.html)|[MK20DX256VLH7](https://www.mouser.com/ProductDetail/NXP-Freescale/MK20DX256VLH7) ARM-Cortex M4|72MHz|256k|32k|3.3V-5V|yes
+You can also SSH into the virtual machine with:
 
-  #### Teensy 3.5 / 3.6
+```
+$ vagrant ssh
+```
 
-  boards|processor|speed|flash|sram|logic|fpu
-  ----|---------|-----|-----|----|-----|---
-  [Teensy 3.5](https://www.pjrc.com/store/teensy35.html)|[MK64FX512VMD12](https://www.mouser.com/ProductDetail/NXP-Freescale/MK64FX512VMD12) ARM-Cortex M4|120MHz|512k|192k|3.3-5V|yes
-  [Teensy 3.6](https://www.pjrc.com/store/teensy36.html)|[MK66FX1M0VMD18](https://www.mouser.com/ProductDetail/NXP-Freescale/MK66FX1M0VMD18) ARM-Cortex M4|180MHz|1M|256k|3.3V|yes
+### Run locally with Ruby
 
-## Submitting Patches
+This website has been developed using Ruby v2.5. You can install the
+dependencies with:
 
-Proposed patches should be submitted as a Pull Request against the ([bugfix-2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x)) branch.
+```bash
+$ gem install bundler
+$ bundle install
+```
 
-- This branch is for fixing bugs and integrating any new features for the duration of the Marlin 2.0.x life-cycle.
-- Follow the [Coding Standards](https://marlinfw.org/docs/development/coding_standards.html) to gain points with the maintainers.
-- Please submit your questions and concerns to the [Issue Queue](https://github.com/MarlinFirmware/Marlin/issues).
+### Build the docs using the remote theme
 
-### [RepRap.org Wiki Page](https://reprap.org/wiki/Marlin)
+The Jekyll project here is configured with the root of this repository as the
+root of the website, so when it is built locally it will see all pages as being
+inside a "docs" folder, and therefore in the "docs" category in the left
+navigation bar and page URLs.
 
-## Credits
+On the other hand the root of the website built and served with
+[GitHub Pages](https://carlosperate.github.io/jekyll-theme-rtd) is the
+"docs" folder, so the left navigation bar will show the child folder as
+categories and the URLs will be different.
 
-The current Marlin dev team consists of:
+For updating the theme documentation it can be useful to build and sever the
+docs folder with the same configuration as GitHub Pages. Of course, this would
+mean that the theme used will be the current snapshot of `master` on GitHub
+instead of the local files, but that is not important to just preview the docs.
 
- - Scott Lahteine [[@thinkyhead](https://github.com/thinkyhead)] - USA &nbsp; [Donate](https://www.thinkyhead.com/donate-to-marlin) / Flattr: [![Flattr Scott](https://api.flattr.com/button/flattr-badge-small.png)](https://flattr.com/submit/auto?user_id=thinkyhead&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
- - Roxanne Neufeld [[@Roxy-3D](https://github.com/Roxy-3D)] - USA
- - Chris Pepper [[@p3p](https://github.com/p3p)] - UK
- - Bob Kuhn [[@Bob-the-Kuhn](https://github.com/Bob-the-Kuhn)] - USA
- - João Brazio [[@jbrazio](https://github.com/jbrazio)] - Portugal
- - Erik van der Zalm [[@ErikZalm](https://github.com/ErikZalm)] - Netherlands &nbsp; [![Flattr Erik](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=ErikZalm&url=https://github.com/MarlinFirmware/Marlin&title=Marlin&language=&tags=github&category=software)
+To do this, add the following lines to the `docs/_config.yml` file:
 
-## License
+```yml
+plugins:
+  - jekyll-remote-theme
+```
 
-Marlin is published under the [GPL license](/LICENSE) because we believe in open development. The GPL comes with both rights and obligations. Whether you use Marlin firmware as the driver for your open or closed-source product, you must keep Marlin open, and you must provide your compatible Marlin source code to end users upon request. The most straightforward way to comply with the Marlin license is to make a fork of Marlin on Github, perform your modifications, and direct users to your modified fork.
+Then execute Jekyll from the docs folder:
 
-While we can't prevent the use of this code in products (3D printers, CNC, etc.) that are closed source or crippled by a patent, we would prefer that you choose another firmware or, better yet, make your own.
+```
+$ vagrant up --no-provision
+$ vagrant ssh
+(ssh session) $ cd /vagrant/docs
+(ssh session) $ bundle exec jekyll serve --host 0.0.0.0 --watch --force_polling
+```
+
+### Build the docs with MkDocs for comparison
+
+As this theme has been ported from the MkDocs port, it can be useful to run
+MkDocs on the documentation markdown file and compare its output to the Jekyll
+output. A `mkdocs.yml` file is included to configure the project.
+
+Pipenv has been used to manage Python dependencies:
+
+```bash
+$ pip install pipenv
+$ pipenv install
+$ pipenv run mkdocs build
+$ cd _site_mkdocs
+$ pipenv run python -m http.server 8080
+```
+
+
+## 👨‍👩‍👧‍👦 Contributing
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/carlosperate/jekyll-theme-rtd.
+
+This project is intended to be a safe, welcoming space for collaboration, and
+contributors are expected to adhere to the
+[Contributor Covenant](http://contributor-covenant.org) code of conduct.
+
+
+## ⚖️ License
+
+The original theme is from
+[Read The Docs](https://github.com/readthedocs/sphinx_rtd_theme). Copyright ©
+2013-2018 Dave Snider, Read the Docs, Inc. & contributors, and released under
+the [MIT License](LICENSE-rtd).
+
+This theme is based on the [MkDocs](https://github.com/mkdocs/mkdocs)
+[`readthedocs` port](https://github.com/mkdocs/mkdocs/tree/1.0.4/mkdocs/themes/readthedocs).
+Copyright © 2014, Tom Christie, all rights reserved, and released under the
+[BSD 2-Clause "Simplified" License](LICENSE-mkdocs).
+
+The theme modifications to port it Jekyll can be seen
+[here](https://github.com/carlosperate/jekyll-theme-rtd/compare/dddce9f13fde24c03aee4533158c43091120d47e...master).
+This and all new features are released under the
+[BSD 2-Clause "Simplified" License](LICENSE).
