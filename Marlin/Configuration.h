@@ -74,8 +74,8 @@
   // If movement is choppy try lowering this value
   #define SCARA_SEGMENTS_PER_SECOND 1000
   // Length of inner and outer support arms. Measure arm lengths precisely.
-  #define SCARA_LINKAGE_1  430    // (mm)
-  #define SCARA_LINKAGE_2  230    // (mm)
+  #define SCARA_LINKAGE_1  400    // (mm)
+  #define SCARA_LINKAGE_2  200    // (mm)
   // SCARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
   #define SCARA_OFFSET_X    0       // (mm)
@@ -1172,7 +1172,7 @@
 #define Y_MAX_POS Y_BED_SIZE
 #define Z_MAX_POS 600
 
-#define MANUAL_X_HOME_POS 660
+#define MANUAL_X_HOME_POS 600
 #define MANUAL_Y_HOME_POS 0
 #define MANUAL_Z_HOME_POS 0
 #define mWorkGoHome
