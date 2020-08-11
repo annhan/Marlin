@@ -78,16 +78,16 @@
   #define SCARA_LINKAGE_2  200    // (mm)
   // SCARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
-  #define SCARA_OFFSET_X    0       // (mm)
-  #define SCARA_OFFSET_Y    0       // (mm)
+  #define SCARA_OFFSET_X    250       // (mm)
+  #define SCARA_OFFSET_Y    -300       // (mm)
   #if ENABLED(MORGAN_SCARA)
     //#define DEBUG_SCARA_KINEMATICS
    //#define SCARA_FEEDRATE_SCALING  // Convert XY feedrate from mm/s to degrees/s on the fly
     // Radius around the center where the arm cannot reach
-    #define MIDDLE_DEAD_ZONE_R   0  // (mm)
+    #define MIDDLE_DEAD_ZONE_R   300  // (mm)
 
-    #define THETA_HOMING_OFFSET  0  // Calculated from Calibration Guide and M360 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
-    #define PSI_HOMING_OFFSET    0  // Calculated from Calibration Guide and M364 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
+   // #define THETA_HOMING_OFFSET  0  // Calculated from Calibration Guide and M360 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
+   // #define PSI_HOMING_OFFSET    0  // Calculated from Calibration Guide and M364 / M114. See http://reprap.harleystudio.co.za/?page_id=1073
   #elif ENABLED(MP_SCARA)
     #define SCARA_OFFSET_THETA1  12 // degrees
     #define SCARA_OFFSET_THETA2 131 // degrees
@@ -1156,13 +1156,13 @@
 // :[-1,1]
 #define X_HOME_DIR -1
 #define Y_HOME_DIR 1
-#define Z_HOME_DIR -1
+#define Z_HOME_DIR 1
 
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 200
-#define Y_BED_SIZE 200
+#define X_BED_SIZE 500
+#define Y_BED_SIZE 250
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
@@ -1181,7 +1181,7 @@
   #define PSI_ANGLE_AT_HOME 135
 #endif
 // Homing speeds (mm/m)
-#define HOMING_FEEDRATE_XY (10*60)
+#define HOMING_FEEDRATE_XY (5*60)
 #define HOMING_FEEDRATE_Z  (4*60)
 /**
  * Software Endstops
