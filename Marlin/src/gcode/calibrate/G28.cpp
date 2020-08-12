@@ -74,9 +74,9 @@
           const millis_t ms = millis();
           if (ELAPSED(ms, time_end)) { // check
             time_end = ms + 100;
-           /* const float x_tam = planner.get_axis_position_degrees(A_AXIS),
+            const float x_tam = planner.get_axis_position_degrees(A_AXIS),
                         y_tam = planner.get_axis_position_degrees(B_AXIS);
-            if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;*/
+            if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;
           }
           idle();
         }
