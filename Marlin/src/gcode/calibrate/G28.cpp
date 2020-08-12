@@ -88,6 +88,7 @@
         sync_plan_position();
       }
       static void quick_home_xy() {
+        endstops.hit_on_purpose();
         mWork_Set_Pos_Frome_angles(0,10);
         SERIAL_ECHOPGM(">X Home\n");
         mWork_Home_EndStop(360.0 * X_HOME_DIR,0,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
@@ -344,7 +345,6 @@ void GcodeSuite::G28() {
     #if Z_HOME_DIR > 0  // If homing away from BED do Z first
 
       if (doZ) homeaxis(Z_AXIS);
-
     #endif
 
     const float z_homing_height =
