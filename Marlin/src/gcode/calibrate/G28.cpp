@@ -69,14 +69,14 @@
         uint8_t extruder = 0;
         float mm = 360;
         planner.buffer_segment(_theta, _psi, delta.c, e_tam, feedRate, extruder, mm);
-        millis_t time_end = millis() + 1000;
+        millis_t time_end = millis() + 100;
         while (!endstops.any()) {
           const millis_t ms = millis();
           if (ELAPSED(ms, time_end)) { // check
-            time_end = ms + 1000;
-            const float x_tam = planner.get_axis_position_degrees(A_AXIS),
+            time_end = ms + 100;
+           /* const float x_tam = planner.get_axis_position_degrees(A_AXIS),
                         y_tam = planner.get_axis_position_degrees(B_AXIS);
-            if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;
+            if (NEAR(x_tam, _theta) && NEAR(y_tam, _psi)) break;*/
           }
           idle();
         }
@@ -88,10 +88,14 @@
         sync_plan_position();
       }
       static void quick_home_xy() {
-        mWork_Set_Pos_Frome_angles(0,0);
+        mWork_Set_Pos_Frome_angles(0,10);
+        SERIAL_ECHOPGM(">X Home\n");
         mWork_Home_EndStop(360.0 * X_HOME_DIR,0,homing_feedrate(X_AXIS)); //Move X 360 angles and wait endstop
-        mWork_Set_Pos_Frome_angles(0,0); 
+        SERIAL_ECHOPGM(">X END\n");
+        mWork_Set_Pos_Frome_angles(0,10); 
+        SERIAL_ECHOPGM(">Y Home\n");
         mWork_Home_EndStop( 0 , 360.0* Y_HOME_DIR , homing_feedrate(Y_AXIS)); //Move Y 360 angles and wait endstop
+        SERIAL_ECHOPGM(">y END\n");
         mWork_Set_Pos_Frome_angles(THETA_ANGLE_AT_HOME,PSI_ANGLE_AT_HOME);  // Set Home position
       }
   #else
