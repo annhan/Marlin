@@ -75,11 +75,11 @@
   #define SCARA_SEGMENTS_PER_SECOND 1000
   // Length of inner and outer support arms. Measure arm lengths precisely.
   #define SCARA_LINKAGE_1  400    // (mm)
-  #define SCARA_LINKAGE_2  200    // (mm)
+  #define SCARA_LINKAGE_2  180    // (mm)
   // SCARA tower offset (position of Tower relative to bed zero position)
   // This needs to be reasonably accurate as it defines the printbed position in the SCARA space.
   #define SCARA_OFFSET_X    250       // (mm)
-  #define SCARA_OFFSET_Y    -300       // (mm)
+  #define SCARA_OFFSET_Y    -310       // (mm)
   #if ENABLED(MORGAN_SCARA)
     //#define DEBUG_SCARA_KINEMATICS
    //#define SCARA_FEEDRATE_SCALING  // Convert XY feedrate from mm/s to degrees/s on the fly
@@ -743,7 +743,7 @@
  *
  * :[2,3,4,5,6,7]
  */
-#define ENDSTOP_NOISE_THRESHOLD 2
+#define ENDSTOP_NOISE_THRESHOLD 3
 
 // Check for stuck or disconnected endstops during homing moves.
 //#define DETECT_BROKEN_ENDSTOP
@@ -786,7 +786,7 @@
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 300, 300, 3000, 25 }
+#define DEFAULT_MAX_FEEDRATE          { 3000, 3000, 3000, 25 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -828,8 +828,8 @@
  */
 #define CLASSIC_JERK
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK 10.0
-  #define DEFAULT_YJERK 10.0
+  #define DEFAULT_XJERK 1.0
+  #define DEFAULT_YJERK 1.0
   #define DEFAULT_ZJERK  0.3
 
   //#define TRAVEL_EXTRA_XYJERK 0.0     // Additional jerk allowance for all travel moves
@@ -1162,7 +1162,7 @@
 
 // The size of the print bed
 #define X_BED_SIZE 500
-#define Y_BED_SIZE 250
+#define Y_BED_SIZE 220
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0
