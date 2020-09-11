@@ -485,7 +485,6 @@ namespace Language_fr {
   PROGMEM Language_Str MSG_RUNOUT_SENSOR                   = _UxGT("Capteur fil.");
   PROGMEM Language_Str MSG_KILL_HOMING_FAILED              = _UxGT("Echec origine");
   PROGMEM Language_Str MSG_LCD_PROBING_FAILED              = _UxGT("Echec sonde");
-  PROGMEM Language_Str MSG_M600_TOO_COLD                   = _UxGT("M600: Trop froid");
 
   PROGMEM Language_Str MSG_KILL_MMU2_FIRMWARE              = _UxGT("MAJ firmware MMU!!");
   PROGMEM Language_Str MSG_MMU2_CHOOSE_FILAMENT_HEADER     = _UxGT("CHOISIR FILAMENT");
@@ -508,7 +507,7 @@ namespace Language_fr {
   PROGMEM Language_Str MSG_MMU2_RESETTING                  = _UxGT("Réinit. MMU...");
   PROGMEM Language_Str MSG_MMU2_EJECT_RECOVER              = _UxGT("Retrait, click");
 
-  PROGMEM Language_Str MSG_MIX_COMPONENT_N                 = _UxGT("Composante ~");
+  PROGMEM Language_Str MSG_MIX_COMPONENT_N                 = _UxGT("Composante =");
   PROGMEM Language_Str MSG_MIXER                           = _UxGT("Mixeur");
   PROGMEM Language_Str MSG_GRADIENT                        = _UxGT("Dégradé");
   PROGMEM Language_Str MSG_FULL_GRADIENT                   = _UxGT("Dégradé complet");
