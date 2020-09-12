@@ -1785,14 +1785,14 @@
  */
 //#define SPI_SPEED SPI_HALF_SPEED
 //#define SPI_SPEED SPI_QUARTER_SPEED
-#define SPI_SPEED SPI_EIGHTH_SPEED
+//#define SPI_SPEED SPI_EIGHTH_SPEED
 
 /**
  * SD CARD: ENABLE CRC
  *
  * Use CRC checks and retries on the SD communication.
  */
-#define SD_CHECK_AND_RETRY
+//#define SD_CHECK_AND_RETRY
 
 /**
  * LCD Menu Items
@@ -2034,7 +2034,7 @@
 // ReprapWorld Graphical LCD
 // https://reprapworld.com/?products_details&products_id/1218
 //
-//#define REPRAPWORLD_GRAPHICAL_LCD
+//#define REPRAPWORLD_GRAPHICAL_LCD ///////////////////////////////////////////////////////////////////////////
 
 //
 // Activate one of these if you have a Panucatt Devices
