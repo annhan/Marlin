@@ -135,9 +135,6 @@
 #define SD_DETECT_PIN                         60
 #define LED_PIN                               13
 #define PS_ON_PIN                             32
-  #define SCK_PIN           76
-  #define MISO_PIN          74
-  #define MOSI_PIN          75
 //
 // SPI Buses
 //
@@ -165,14 +162,15 @@
 
 #define BEEPER_PIN                            27
 
-#if ENABLED(REPRAPWORLD_GRAPHICAL_LCD)
+#if ENABLED(REPRAPWORLD_GRAPHICAL_LCD) || ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
 
-  #define LCD_PINS_RS                         A8  // CS chip select / SS chip slave select
-  #define LCD_PINS_ENABLE                   MOSI  // SID (MOSI)
-  #define LCD_PINS_D4                        SCK  // SCK (CLK) clock
+  #define LCD_PINS_RS                       62  // CS chip select / SS chip slave select A8
+  #define LCD_PINS_ENABLE                   MOSI //MOSI  // SID (MOSI) A2
+  #define LCD_PINS_D4                       SCK //SCK  // SCK (CLK) clock A9
 
   #define BTN_EN1                             20
   #define BTN_EN2                             21
-  #define BTN_ENC                             64
+  #define BTN_ENC                             64 //A10
 
 #endif // REPRAPWORLD_GRAPHICAL_LCD
+
