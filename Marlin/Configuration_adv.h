@@ -1200,7 +1200,7 @@
    *  - SDSORT_CACHE_NAMES will retain the sorted file listing in RAM. (Expensive!)
    *  - SDSORT_DYNAMIC_RAM only uses RAM when the SD menu is visible. (Use with caution!)
    */
-  #define SDCARD_SORT_ALPHA
+  //#define SDCARD_SORT_ALPHA
 
   // SD Card Sorting options
   #if ENABLED(SDCARD_SORT_ALPHA)
@@ -1216,10 +1216,10 @@
   #endif
 
   // This allows hosts to request long names for files and folders with M33
-  #define LONG_FILENAME_HOST_SUPPORT
+  //#define LONG_FILENAME_HOST_SUPPORT
 
   // Enable this option to scroll long filenames in the SD card menu
-  #define SCROLL_LONG_FILENAMES
+  //#define SCROLL_LONG_FILENAMES
 
   // Leave the heaters on after Stop Print (not recommended!)
   //#define SD_ABORT_NO_COOLDOWN
@@ -1241,7 +1241,7 @@
   /**
    * Auto-report SdCard status with M27 S<seconds>
    */
-  #define AUTO_REPORT_SD_STATUS
+  //#define AUTO_REPORT_SD_STATUS
 
   /**
    * Support for USB thumb drives using an Arduino USB Host Shield or

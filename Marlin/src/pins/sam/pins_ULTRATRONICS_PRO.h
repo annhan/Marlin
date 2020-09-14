@@ -135,7 +135,9 @@
 #define SD_DETECT_PIN                         60
 #define LED_PIN                               13
 #define PS_ON_PIN                             32
-
+  #define SCK_PIN           76
+  #define MISO_PIN          74
+  #define MOSI_PIN          75
 //
 // SPI Buses
 //
