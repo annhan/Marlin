@@ -61,7 +61,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
               thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
             }
           }
-          #if !defined(SINGLENOZZLE) && EXTRUDERS >= 2
+          #if !defined(SINGLENOZZLE) && HAS_MULTI_EXTRUDER
             else if ((int)thermalManager.temp_hotend[uiCfg.curSprayerChoose].target > (HEATER_1_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1))) {
               thermalManager.temp_hotend[uiCfg.curSprayerChoose].target = (float)HEATER_1_MAXTEMP - (WATCH_TEMP_INCREASE + TEMP_HYSTERESIS + 1);
               thermalManager.start_watching_hotend(uiCfg.curSprayerChoose);
@@ -117,7 +117,7 @@ static void event_handler(lv_obj_t * obj, lv_event_t event) {
       }
       else if (event == LV_EVENT_RELEASED) {
         if (uiCfg.curTempType == 0) {
-          if (EXTRUDERS == 2) {
+          if (ENABLED(HAS_MULTI_EXTRUDER)) {
             if (uiCfg.curSprayerChoose == 0) {
               uiCfg.curSprayerChoose = 1;
             }
@@ -267,7 +267,7 @@ void lv_draw_preHeat(void) {
   lv_obj_set_pos(buttonOff, BTN_X_PIXEL * 2 + INTERVAL_V * 3, BTN_Y_PIXEL + INTERVAL_H + titleHeight);
   lv_obj_set_pos(buttonBack, BTN_X_PIXEL * 3 + INTERVAL_V * 4, BTN_Y_PIXEL + INTERVAL_H + titleHeight);
 
-  /*Create a label on the Image button*/
+  // Create labels on the image buttons
   lv_btn_set_layout(buttonAdd, LV_LAYOUT_OFF);
   lv_btn_set_layout(buttonDec, LV_LAYOUT_OFF);
   lv_btn_set_layout(buttoType, LV_LAYOUT_OFF);
@@ -275,13 +275,12 @@ void lv_draw_preHeat(void) {
   lv_btn_set_layout(buttonOff, LV_LAYOUT_OFF);
   lv_btn_set_layout(buttonBack, LV_LAYOUT_OFF);
 
-  lv_obj_t * labelAdd = lv_label_create(buttonAdd, NULL);
-  lv_obj_t * labelDec = lv_label_create(buttonDec, NULL);
+  lv_obj_t *labelAdd = lv_label_create(buttonAdd, NULL);
+  lv_obj_t *labelDec = lv_label_create(buttonDec, NULL);
   labelType = lv_label_create(buttoType, NULL);
   labelStep = lv_label_create(buttonStep, NULL);
-  lv_obj_t * labelOff   = lv_label_create(buttonOff, NULL);
-  lv_obj_t * label_Back = lv_label_create(buttonBack, NULL);
-
+  lv_obj_t *labelOff   = lv_label_create(buttonOff, NULL);
+  lv_obj_t *label_Back = lv_label_create(buttonBack, NULL);
 
   if (gCfgItems.multiple_language != 0) {
     lv_label_set_text(labelAdd, preheat_menu.add);
@@ -306,7 +305,6 @@ void lv_draw_preHeat(void) {
 }
 
 void disp_temp_type() {
-
   if (uiCfg.curTempType == 0) {
     if (uiCfg.curSprayerChoose == 1) {
       lv_obj_set_event_cb_mks(buttoType, event_handler, ID_P_TYPE, "bmp_extru2.bin", 0);
@@ -331,7 +329,6 @@ void disp_temp_type() {
       lv_obj_align(labelType, buttoType, LV_ALIGN_IN_BOTTOM_MID, 0, BUTTON_TEXT_Y_OFFSET);
     }
   }
-
 }
 
 void disp_desire_temp() {

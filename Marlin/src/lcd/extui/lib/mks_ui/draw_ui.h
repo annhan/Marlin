@@ -161,7 +161,7 @@ typedef struct {
   uint8_t waitEndMoves;
   uint16_t moveSpeed;
   float move_dist;
-  uint8_t	F[4];
+  uint8_t F[4];
 } UI_CFG;
 
 typedef enum {
@@ -328,5 +328,5 @@ extern void LV_TASK_HANDLER();
 extern void lv_ex_line(lv_obj_t * line, lv_point_t *points);
 
 #ifdef __cplusplus
-} /* C-declarations for C++ */
+  } /* C-declarations for C++ */
 #endif
