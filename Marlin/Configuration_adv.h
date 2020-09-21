@@ -1257,12 +1257,15 @@
    *
    * [1] On AVR an interrupt-capable pin is best for UHS3 compatibility.
    */
-  //#define USB_FLASH_DRIVE_SUPPORT
+  #define USB_FLASH_DRIVE_SUPPORT
   #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
     #define USB_CS_PIN    SDSS
     #define USB_INTR_PIN  SD_DETECT_PIN
 
     /**
+     * //
+      #define SDSS                                  59
+      #define SD_DETECT_PIN                         60
      * USB Host Shield Library
      *
      * - UHS2 uses no interrupts and has been production-tested

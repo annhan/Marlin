@@ -30,6 +30,7 @@
  *    3 - perform block range checking
  *    4 - print each block access
  */
+
 #define USB_DEBUG         1
 #define USB_STARTUP_DELAY 0
 
