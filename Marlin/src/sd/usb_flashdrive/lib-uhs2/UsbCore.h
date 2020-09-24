@@ -114,7 +114,7 @@ typedef MAX3421e<P10, P9> MAX3421E; // Official Arduinos (UNO, Duemilanove, Mega
 
 #define USB_NUMDEVICES          16      //number of USB devices
 //#define HUB_MAX_HUBS          7       // maximum number of hubs that can be attached to the host controller
-#define HUB_PORT_RESET_DELAY    20      // hub port reset delay 10 ms recomended, can be up to 20 ms
+#define HUB_PORT_RESET_DELAY    15      // hub port reset delay 10 ms recomended, can be up to 20 ms
 
 /* USB state machine states */
 #define USB_STATE_MASK                                      0xf0
@@ -123,7 +123,7 @@ typedef MAX3421e<P10, P9> MAX3421E; // Official Arduinos (UNO, Duemilanove, Mega
 #define USB_DETACHED_SUBSTATE_INITIALIZE                    0x11
 #define USB_DETACHED_SUBSTATE_WAIT_FOR_DEVICE               0x12
 #define USB_DETACHED_SUBSTATE_ILLEGAL                       0x13
-#define USB_ATTACHED_SUBSTATE_SETTLE                        0x20
+#define USB_ATTACHED_SUBSTATE_SETTLE                        0x20 //state 2 - 32 0x20
 #define USB_ATTACHED_SUBSTATE_RESET_DEVICE                  0x30
 #define USB_ATTACHED_SUBSTATE_WAIT_RESET_COMPLETE           0x40
 #define USB_ATTACHED_SUBSTATE_WAIT_SOF                      0x50
@@ -131,7 +131,7 @@ typedef MAX3421e<P10, P9> MAX3421E; // Official Arduinos (UNO, Duemilanove, Mega
 #define USB_ATTACHED_SUBSTATE_GET_DEVICE_DESCRIPTOR_SIZE    0x60
 #define USB_STATE_ADDRESSING                                0x70
 #define USB_STATE_CONFIGURING                               0x80
-#define USB_STATE_RUNNING                                   0x90
+#define USB_STATE_RUNNING                                   0x90  //state 3 - 144
 #define USB_STATE_ERROR                                     0xa0
 
 class USBDeviceConfig {

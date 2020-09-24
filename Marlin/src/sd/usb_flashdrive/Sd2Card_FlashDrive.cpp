@@ -35,7 +35,7 @@
 #define USB_STARTUP_DELAY 0
 
 // uncomment to get 'printf' console debugging. NOT FOR UNO!
-//#define HOST_DEBUG(...)     {char s[255]; sprintf(s,__VA_ARGS__); SERIAL_ECHOLNPAIR("UHS:",s);}
+////#define HOST_DEBUG(...)     {char s[255]; sprintf(s,__VA_ARGS__); SERIAL_ECHOLNPAIR("UHS:",s);}
 //#define BS_HOST_DEBUG(...)  {char s[255]; sprintf(s,__VA_ARGS__); SERIAL_ECHOLNPAIR("UHS:",s);}
 //#define MAX_HOST_DEBUG(...) {char s[255]; sprintf(s,__VA_ARGS__); SERIAL_ECHOLNPAIR("UHS:",s);}
 
@@ -171,7 +171,7 @@ void Sd2Card::idle() {
   #define GOTO_STATE_AFTER_DELAY(STATE, DELAY) do{ state = STATE; next_state_ms  = millis() + DELAY; }while(0)
 
   if (ELAPSED(millis(), next_state_ms)) {
-    GOTO_STATE_AFTER_DELAY(state, 250); // Default delay
+    GOTO_STATE_AFTER_DELAY(state, 1000); // Default delay
 
     switch (state) {
 
@@ -184,6 +184,9 @@ void Sd2Card::idle() {
       case DO_STARTUP: usbStartup(); break;
 
       case WAIT_FOR_DEVICE:
+        #if USB_DEBUG >= 1
+          SERIAL_ECHO_MSG(" WAIT_FOR_DEVICE : " , usb.getUsbTaskState());
+        #endif
         if (task_state == UHS_STATE(RUNNING)) {
           #if USB_DEBUG >= 1
             SERIAL_ECHOLNPGM("USB device inserted");
@@ -224,8 +227,10 @@ void Sd2Card::idle() {
       #if USB_DEBUG >= 1
         SERIAL_ECHOLNPGM("USB device removed");
       #endif
-      if (state != MEDIA_READY)
+      if (state != MEDIA_READY){
         LCD_MESSAGEPGM(MSG_MEDIA_USB_REMOVED);
+      }
+        
       GOTO_STATE_AFTER_DELAY(WAIT_FOR_DEVICE, 0);
     }
 

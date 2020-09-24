@@ -20,13 +20,7 @@
  *
  */
 #pragma once
-#if BOTH(HAS_GRAPHICAL_LCD, SDSUPPORT) && (LCD_PINS_D4 == SCK_PIN || DOGLCD_SCK == SCK_PIN || DOGLCD_MOSI == MOSI_PIN || LCD_PINS_ENABLE == MOSI_PIN  )
-  #define DUE_SOFTWARE_SPI  // If the SD card and LCD adapter share the same SPI pins, then software SPI is currently
-                            // needed due to the speed and mode required for communicating with each device being different.
-                            // This requirement can be removed if the SPI access to these devices is updated to use
-                            // spiBeginTransaction.
-                            // 
-#endif
+
 /**
  * Define SPI Pins: SCK, MISO, MOSI, SS
  *
