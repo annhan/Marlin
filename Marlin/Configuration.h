@@ -2024,7 +2024,9 @@
 // https://reprap.org/wiki/RepRapDiscount_Full_Graphic_Smart_Controller
 //
 #define REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER
-
+#define ST7920_DELAY_1 DELAY_NS(700)
+#define ST7920_DELAY_2 DELAY_NS(700)
+#define ST7920_DELAY_3 DELAY_NS(500)
 //
 // ReprapWorld Graphical LCD
 // https://reprapworld.com/?products_details&products_id/1218

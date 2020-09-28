@@ -47,6 +47,7 @@ void HAL_init() {
   // Initialize the USB stack
   #if ENABLED(SDSUPPORT)
     OUT_WRITE(SDSS, HIGH);  // Try to set SDSS inactive before any other SPI users start up
+    //OUT_WRITE(SDSS, LOW);  // MWORK Try to set SDSS inactive before any other SPI users start up
   #endif
   usb_task_init();
 }

@@ -171,7 +171,7 @@ void Sd2Card::idle() {
   #define GOTO_STATE_AFTER_DELAY(STATE, DELAY) do{ state = STATE; next_state_ms  = millis() + DELAY; }while(0)
 
   if (ELAPSED(millis(), next_state_ms)) {
-    GOTO_STATE_AFTER_DELAY(state, 1000); // Default delay
+    GOTO_STATE_AFTER_DELAY(state, 250); // Default delay
 
     switch (state) {
 
@@ -184,9 +184,9 @@ void Sd2Card::idle() {
       case DO_STARTUP: usbStartup(); break;
 
       case WAIT_FOR_DEVICE:
-        #if USB_DEBUG >= 1
-          SERIAL_ECHO_MSG(" WAIT_FOR_DEVICE : " , usb.getUsbTaskState());
-        #endif
+        /*#if USB_DEBUG >= 1
+          SERIAL_ECHO_MSG(" MWORK WAIT_FOR_DEVICE : " , usb.getUsbTaskState());
+        #endif*/
         if (task_state == UHS_STATE(RUNNING)) {
           #if USB_DEBUG >= 1
             SERIAL_ECHOLNPGM("USB device inserted");
