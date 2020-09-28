@@ -1107,18 +1107,18 @@
   #define BOOTSCREEN_TIMEOUT 1000        // (ms) Total Duration to display the boot screen(s)
 #endif
 
-#if EITHER(SDSUPPORT, LCD_SET_PROGRESS_MANUALLY) && (HAS_GRAPHICAL_LCD || HAS_CHARACTER_LCD)
+#if EITHER(SDSUPPORT, LCD_SET_PROGRESS_MANUALLY) && ANY(HAS_MARLINUI_U8GLIB, HAS_MARLINUI_HD44780, IS_TFTGLCD_PANEL)
   //#define SHOW_REMAINING_TIME       // Display estimated time to completion
   #if ENABLED(SHOW_REMAINING_TIME)
     //#define USE_M73_REMAINING_TIME  // Use remaining time from M73 command instead of estimation
     //#define ROTATE_PROGRESS_DISPLAY // Display (P)rogress, (E)lapsed, and (R)emaining time
   #endif
 
-  #if HAS_GRAPHICAL_LCD
+  #if HAS_MARLINUI_U8GLIB
     //#define PRINT_PROGRESS_SHOW_DECIMALS // Show progress with decimal digits
   #endif
 
-  #if HAS_CHARACTER_LCD
+  #if EITHER(HAS_MARLINUI_HD44780, IS_TFTGLCD_PANEL)
     //#define LCD_PROGRESS_BAR            // Show a progress bar on HD44780 LCDs for SD printing
     #if ENABLED(LCD_PROGRESS_BAR)
       #define PROGRESS_BAR_BAR_TIME 2000  // (ms) Amount of time to show the bar
@@ -1332,7 +1332,7 @@
  * controller events, as there is a trade-off between reliable
  * printing performance versus fast display updates.
  */
-#if HAS_GRAPHICAL_LCD
+#if HAS_MARLINUI_U8GLIB
   // Show SD percentage next to the progress bar
   //#define DOGM_SD_PERCENT
 
@@ -1402,18 +1402,18 @@
   #define MARLIN_SNAKE
   //#define GAMES_EASTER_EGG          // Add extra blank lines above the "Games" sub-menu
 
-#endif // HAS_GRAPHICAL_LCD
+#endif // HAS_MARLINUI_U8GLIB
 
 //
 // Additional options for DGUS / DWIN displays
 //
 #if HAS_DGUS_LCD
-  #define DGUS_SERIAL_PORT 3
-  #define DGUS_BAUDRATE 115200
+  #define LCD_SERIAL_PORT 3
+  #define LCD_BAUDRATE 115200
 
   #define DGUS_RX_BUFFER_SIZE 128
   #define DGUS_TX_BUFFER_SIZE 48
-  //#define DGUS_SERIAL_STATS_RX_BUFFER_OVERRUNS  // Fix Rx overrun situation (Currently only for AVR)
+  //#define SERIAL_STATS_RX_BUFFER_OVERRUNS  // Fix Rx overrun situation (Currently only for AVR)
 
   #define DGUS_UPDATE_INTERVAL_MS  500    // (ms) Interval between automatic screen updates
 
@@ -3423,10 +3423,10 @@
 #if ENABLED(PRUSA_MMU2)
 
   // Serial port used for communication with MMU2.
-  // For AVR enable the UART port used for the MMU. (e.g., internalSerial)
+  // For AVR enable the UART port used for the MMU. (e.g., mmuSerial)
   // For 32-bit boards check your HAL for available serial ports. (e.g., Serial2)
-  #define INTERNAL_SERIAL_PORT 2
-  #define MMU2_SERIAL internalSerial
+  #define MMU2_SERIAL_PORT 2
+  #define MMU2_SERIAL mmuSerial
 
   // Use hardware reset for MMU if a pin is defined for it
   //#define MMU2_RST_PIN 23
@@ -3477,7 +3477,7 @@
    */
   //#define MMU_EXTRUDER_SENSOR
   #if ENABLED(MMU_EXTRUDER_SENSOR)
-    #define MMU_LOADING_ATTEMPTS_NR 5 //max. number of attempts to load filament if first load fail
+    #define MMU_LOADING_ATTEMPTS_NR 5 // max. number of attempts to load filament if first load fail
   #endif
 
   /**
