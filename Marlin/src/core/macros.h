@@ -256,6 +256,7 @@
 
 #define NOOP (void(0))
 
+
 #define CEILING(x,y) (((x) + (y) - 1) / (y))
 
 #undef ABS

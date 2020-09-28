@@ -53,7 +53,8 @@
   // Make sure GCC optimizes this file.
   // Note that this line triggers a bug in GCC which is fixed by casting.
   // See the note below.
-  #pragma GCC optimize (3)
+  
+  //#pragma GCC optimize (3)
 
   typedef uint8_t (*pfnSpiTransfer)(uint8_t b);
   typedef void    (*pfnSpiRxBlock)(uint8_t* buf, uint32_t nbyte);
