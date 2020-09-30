@@ -669,6 +669,7 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
   #endif
 }
 
+
 /**
  * Standard idle routine keeps the machine alive:
  *  - Core Marlin activities
@@ -691,6 +692,8 @@ inline void manage_inactivity(const bool ignore_stepper_queue=false) {
  *  - Update the Průša MMU2
  *  - Handle Joystick jogging
  */
+
+
 void idle(TERN_(ADVANCED_PAUSE_FEATURE, bool no_stepper_sleep/*=false*/)) {
 
   // Core Marlin activities

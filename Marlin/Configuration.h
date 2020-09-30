@@ -155,7 +155,7 @@
   #define MOTHERBOARD BOARD_ULTRATRONICS_PRO
 #endif
 // Name displayed in the LCD "Ready" message and Info menu
-#define CUSTOM_MACHINE_NAME "MWORK LASER"
+#define CUSTOM_MACHINE_NAME "MWORK"
 
 
 // Printer's unique ID, used by some programs to differentiate between machines.
@@ -1767,10 +1767,10 @@
  * Enable one of the following items for a slower SPI transfer speed.
  * This may be required to resolve "volume init" errors.
  */
-//#define SPI_SPEED SPI_HALF_SPEED
+#define SPI_SPEED SPI_HALF_SPEED
 //#define SPI_SPEED SPI_QUARTER_SPEED
 //#define SPI_SPEED SPI_EIGHTH_SPEED
-#define SPI_SPEED SPI_SIXTEENTH_SPEED
+//#define SPI_SPEED SPI_SIXTEENTH_SPEED
 //SPI_SPEED_5
 //#define SPI_SPEED SPI_SPEED_6
 /**
@@ -1787,7 +1787,7 @@
  * just remove some extraneous menu items to recover space.
  */
 //#define NO_LCD_MENUS
-//#define SLIM_LCD_MENUS
+#define SLIM_LCD_MENUS
 
 //
 // ENCODER SETTINGS

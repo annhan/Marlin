@@ -3,7 +3,7 @@
 // http://en.radzio.dxp.pl/bitmap_converter/
 //------------------------------------------------------------------------------
 #pragma once
-#define CUSTOM_BOOTSCREEN_TIMEOUT 4000
+#define CUSTOM_BOOTSCREEN_TIMEOUT 2000
 #define CUSTOM_BOOTSCREEN_BMPWIDTH 128
 #define CUSTOM_BOOTSCREEN_BMPHEIGHT  64
 
