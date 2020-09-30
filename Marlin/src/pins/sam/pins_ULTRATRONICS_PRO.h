@@ -170,8 +170,8 @@
 #if ENABLED(REPRAPWORLD_GRAPHICAL_LCD) || ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
 
   #define LCD_PINS_RS                       A8  // CS chip select / SS chip slave select A8
-  #define LCD_PINS_ENABLE                   MOSI //75MOSI //MOSI  // SID (MOSI) A2
-  #define LCD_PINS_D4                       SCK //76SCK //SCK  // SCK (CLK) clock A9
+  #define LCD_PINS_ENABLE                   39 // STEP E3 //75MOSI //MOSI  // SID (MOSI) A2
+  #define LCD_PINS_D4                       63 //76SCK //SCK  // SCK (CLK) clock A9
 
   #define BTN_EN1                             20
   #define BTN_EN2                             21

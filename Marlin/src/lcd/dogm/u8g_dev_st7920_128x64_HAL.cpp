@@ -117,6 +117,7 @@ uint8_t u8g_dev_st7920_128x64_HAL_fn(u8g_t *u8g, u8g_dev_t *dev, uint8_t msg, vo
 
       u8g_SetAddress(u8g, dev, 0);           /* cmd mode */
       u8g_SetChipSelect(u8g, dev, 1);
+      
       y = pb->p.page_y0;
       ptr = (uint8_t *)pb->buf;
       for (i = 0; i < 8; i ++) {
