@@ -20,7 +20,7 @@
  *
  */
 #pragma once
-#define MWORK_BOARD
+
 /**
  * ReprapWorld ULTRATRONICS v1.0
  * https://reprapworld.com/documentation/datasheet_ultratronics10_05.pdf
@@ -42,118 +42,68 @@
   #endif
 #endif
 
-#ifndef MWORK_BOARD
-    //
-    // Limit Switches MHOME
-    //
-    #define X_MIN_PIN                             31
-    #define X_MAX_PIN                             30
-    #define Y_MIN_PIN                             12
-    #define Y_MAX_PIN                             11
-    #define Z_MIN_PIN                             29
-    #define Z_MAX_PIN                             28
-
-    //
-    // Steppers
-    //
-    #define X_STEP_PIN                            35
-    #define X_DIR_PIN                             34
-    #define X_ENABLE_PIN                          37
-    #ifndef X_CS_PIN
-      #define X_CS_PIN                            18
-    #endif
-
-    #define Y_STEP_PIN                            22
-    #define Y_DIR_PIN                             23
-    #define Y_ENABLE_PIN                          33
-    #ifndef Y_CS_PIN
-      #define Y_CS_PIN                            19
-    #endif
-
-    #define Z_STEP_PIN                            25
-    #define Z_DIR_PIN                             26
-    #define Z_ENABLE_PIN                          24
-    #ifndef Z_CS_PIN
-      #define Z_CS_PIN                            16
-    #endif
-
-    #define E0_STEP_PIN                           47
-    #define E0_DIR_PIN                            46
-    #define E0_ENABLE_PIN                         48
-    #ifndef E0_CS_PIN
-      #define E0_CS_PIN                           17
-    #endif
-
-    #define E1_STEP_PIN                           -1 //44
-    #define E1_DIR_PIN                            36
-    #define E1_ENABLE_PIN                         -1 //45
-    #ifndef E1_CS_PIN
-      #define E1_CS_PIN                           -1
-    #endif
-
-    #define E2_STEP_PIN                           42
-    #define E2_DIR_PIN                            41
-    #define E2_ENABLE_PIN                         43
-    #ifndef E2_CS_PIN
-      #define E2_CS_PIN                           -1
-    #endif
-
-    #define E3_STEP_PIN                           39
-    #define E3_DIR_PIN                            38
-    #define E3_ENABLE_PIN                         40
-    #ifndef E3_CS_PIN
-      #define E3_CS_PIN                           -1
-    #endif
-#else
 //
-    // Limit Switches MHOME
-    //
-    #define X_MIN_PIN                             11  
-    #define X_MAX_PIN                             30 
-    #define Y_MIN_PIN                             31 
-    #define Y_MAX_PIN                             28 
-    #define Z_MIN_PIN                             29  
-    #define Z_MAX_PIN                             12 
+// Limit Switches MHOME
+//
+#define X_MIN_PIN                             11  // 31
+#define X_MAX_PIN                             30 //30
+#define Y_MIN_PIN                             31 //12
+#define Y_MAX_PIN                             28 //11
+#define Z_MIN_PIN                             29  //29
+#define Z_MAX_PIN                             12 //28
 
-    //
-    // Steppers
-    //
-    #define X_STEP_PIN                            25 //35
-    #define X_DIR_PIN                             26 //34
-    #define X_ENABLE_PIN                          24 //37
-    #ifndef X_CS_PIN
-      #define X_CS_PIN                            -1
-    #endif
-
-    #define Y_STEP_PIN                            22
-    #define Y_DIR_PIN                             23
-    #define Y_ENABLE_PIN                          33
-    #ifndef Y_CS_PIN
-      #define Y_CS_PIN                            -1
-    #endif
-
-    #define Z_STEP_PIN                            35 //25
-    #define Z_DIR_PIN                             34 //26
-    #define Z_ENABLE_PIN                          37 //24
-    #ifndef Z_CS_PIN
-      #define Z_CS_PIN                            -1
-    #endif
-
-    #define E0_STEP_PIN                           39 //47
-    #define E0_DIR_PIN                            38 //46
-    #define E0_ENABLE_PIN                         40 //48
-    #ifndef E0_CS_PIN
-      #define E0_CS_PIN                           -1
-    #endif
-
-    #define E1_STEP_PIN                           42 //44
-    #define E1_DIR_PIN                            41
-    #define E1_ENABLE_PIN                         43 //45
-    #ifndef E1_CS_PIN
-      #define E1_CS_PIN                           -1
-    #endif
-
+//
+// Steppers
+//
+#define X_STEP_PIN                            35
+#define X_DIR_PIN                             34
+#define X_ENABLE_PIN                          37
+#ifndef X_CS_PIN
+  #define X_CS_PIN                            18
 #endif
+
+#define Y_STEP_PIN                            22
+#define Y_DIR_PIN                             23
+#define Y_ENABLE_PIN                          33
+#ifndef Y_CS_PIN
+  #define Y_CS_PIN                            19
+#endif
+
+#define Z_STEP_PIN                            25
+#define Z_DIR_PIN                             26
+#define Z_ENABLE_PIN                          24
+#ifndef Z_CS_PIN
+  #define Z_CS_PIN                            16
+#endif
+
+#define E0_STEP_PIN                           47
+#define E0_DIR_PIN                            46
+#define E0_ENABLE_PIN                         48
+#ifndef E0_CS_PIN
+  #define E0_CS_PIN                           17
+#endif
+
+#define E1_STEP_PIN                           -1 //44
+#define E1_DIR_PIN                            36
+#define E1_ENABLE_PIN                         -1 //45
+#ifndef E1_CS_PIN
+  #define E1_CS_PIN                           -1
+#endif
+
+#define E2_STEP_PIN                           42
+#define E2_DIR_PIN                            41
+#define E2_ENABLE_PIN                         43
+#ifndef E2_CS_PIN
+  #define E2_CS_PIN                           -1
+#endif
+
+#define E3_STEP_PIN                           39
+#define E3_DIR_PIN                            38
+#define E3_ENABLE_PIN                         40
+#ifndef E3_CS_PIN
+  #define E3_CS_PIN                           -1
+#endif
+
 //
 // Temperature Sensors
 //
@@ -190,7 +140,7 @@
 // SPI Buses
 //
 
-#define DAC0_SYNC                             -1 //53  // PB14
+#define DAC0_SYNC                             53  // PB14
 #define SPI_CHAN_DAC                           1
 
 #define SPI_CHAN_EEPROM1                      -1
@@ -230,7 +180,7 @@
 #endif // REPRAPWORLD_GRAPHICAL_LCD
 
 //MWORK IN
-
+#define MWORK_BOARD
 #define MWORK_IN1_PIN                              63
 #define MWORK_IN2_PIN                              53
 #define MWORK_IN3_PIN                              69
