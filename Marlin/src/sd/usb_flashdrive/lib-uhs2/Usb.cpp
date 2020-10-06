@@ -33,8 +33,8 @@
 static uint8_t usb_error = 0;
 static uint8_t usb_task_state;
 
-static uint8_t usb_task_state_mwork;
-uint32_t mworkdelay = 0;
+//static uint8_t usb_task_state_mwork;
+//uint32_t mworkdelay = 0;
 /* constructor */
 USB::USB() : bmHubPre(0) {
   usb_task_state = USB_DETACHED_SUBSTATE_INITIALIZE; //set up state machine
@@ -122,8 +122,6 @@ uint8_t USB::SetAddress(uint8_t addr, uint8_t ep, EpInfo **ppep, uint16_t *nak_l
   //Serial.println( mode, HEX);
   //Serial.print("\r\nLS: ");
   //Serial.println(p->lowspeed, HEX);
-
-
 
   // Set bmLOWSPEED and bmHUBPRE in case of low-speed device, reset them otherwise
   regWr(rMODE, (p->lowspeed) ? mode | bmLOWSPEED | bmHubPre : mode & ~(bmHUBPRE | bmLOWSPEED));
@@ -436,11 +434,13 @@ void USB::Task() { //USB state machine
   MAX3421E::Task();
 
   tmpdata = getVbusState();
+  /**
   if (ELAPSED(millis(), mworkdelay)) {
      mworkdelay  = millis() + 1000;
-      SERIAL_ECHO_MSG(" TASK USB : " , usb_task_state, " Data : ", tmpdata);
-      
+      SERIAL_ECHO_MSG(" TASK USB : " , usb_task_state, " Data : ", tmpdata); 
   }
+  */
+
   /* modify USB task state if Vbus changed */
   switch (tmpdata) {
     case SE1: //illegal state
@@ -463,10 +463,12 @@ void USB::Task() { //USB state machine
       00011000 ->10
       11110000
       */
+     /*
      if (usb_task_state_mwork != usb_task_state){
         usb_task_state_mwork = usb_task_state;
         SERIAL_ECHO_MSG(" TASK USB : " , usb_task_state);
      }
+     */
       if ((usb_task_state & USB_STATE_MASK) == USB_STATE_DETACHED) {
         delay = (uint32_t)millis() + USB_SETTLE_DELAY;
         usb_task_state = USB_ATTACHED_SUBSTATE_SETTLE;

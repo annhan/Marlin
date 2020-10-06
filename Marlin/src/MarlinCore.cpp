@@ -920,7 +920,52 @@ inline void tmc_standby_setup() {
     SET_INPUT_PULLDOWN(E7_STDBY_PIN);
   #endif
 }
+/**
+ * //MWORK IN
 
+//MWORK IN
+#define MWORK_BOARD
+#define MWORK_IN1_PIN                              63
+#define MWORK_IN2_PIN                              53
+#define MWORK_IN3_PIN                              69
+#define MWORK_IN4_PIN                              70
+#define MWORK_IN5_PIN                              66
+//MWORK OUT
+#define MWORK_O1_PIN                              45
+#define MWORK_O2_PIN                              44
+#define MWORK_O3_PIN                              68
+#define MWORK_O4_PIN                              67
+#define MWORK_O4                             67
+ */
+void INIT_INOUT_MWORK(){
+  #if PIN_EXISTS(MWORK_IN1)
+    SET_INPUT(MWORK_IN1_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_IN2)
+    SET_INPUT(MWORK_IN2_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_IN3)
+    SET_INPUT(MWORK_IN3_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_IN4)
+    SET_INPUT(MWORK_IN4_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_IN5)
+    SET_INPUT(MWORK_IN5_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_O1)
+    SET_OUTPUT(MWORK_O1_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_O2)
+    SET_OUTPUT(MWORK_O2_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_O3)
+    SET_OUTPUT(MWORK_O3_PIN);
+  #endif
+  #if PIN_EXISTS(MWORK_O4)
+    SET_OUTPUT(MWORK_O4_PIN);
+  #endif
+}
 /**
  * Marlin entry-point: Set up before the program loop
  *  - Set up the kill pin, filament runout, power hold
@@ -1290,7 +1335,9 @@ void setup() {
   #if ENABLED(PASSWORD_ON_STARTUP)
     SETUP_RUN(password.lock_machine());      // Will not proceed until correct password provided
   #endif
-
+  #if ENABLED(MWORK_BOARD)
+    INIT_INOUT_MWORK();     
+  #endif
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");

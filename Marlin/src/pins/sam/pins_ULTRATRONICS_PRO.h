@@ -43,14 +43,14 @@
 #endif
 
 //
-// Limit Switches
+// Limit Switches MHOME
 //
-#define X_MIN_PIN                             31
-#define X_MAX_PIN                             30
-#define Y_MIN_PIN                             12
-#define Y_MAX_PIN                             11
-#define Z_MIN_PIN                             29
-#define Z_MAX_PIN                             28
+#define X_MIN_PIN                             11  // 31
+#define X_MAX_PIN                             30 //30
+#define Y_MIN_PIN                             31 //12
+#define Y_MAX_PIN                             28 //11
+#define Z_MIN_PIN                             29  //29
+#define Z_MAX_PIN                             12 //28
 
 //
 // Steppers
@@ -83,9 +83,9 @@
   #define E0_CS_PIN                           17
 #endif
 
-#define E1_STEP_PIN                           44
+#define E1_STEP_PIN                           -1 //44
 #define E1_DIR_PIN                            36
-#define E1_ENABLE_PIN                         45
+#define E1_ENABLE_PIN                         -1 //45
 #ifndef E1_CS_PIN
   #define E1_CS_PIN                           -1
 #endif
@@ -117,17 +117,17 @@
 // Heaters / Fans
 //
 #define SPINDLE_LASER_ENA_PIN                  7
-#define SPINDLE_LASER_PWM_PIN                  5 // Chân PWM
+#define SPINDLE_LASER_PWM_PIN                  9 // Chân PWM
 #define HEATER_0_PIN                           3  
 #define HEATER_1_PIN                           8
-#define HEATER_2_PIN                           7
-#define HEATER_3_PIN                           9
+#define HEATER_2_PIN                           -1 //7
+#define HEATER_3_PIN                           -1 //9
 #define HEATER_BED_PIN                         2
 
 #ifndef FAN_PIN
   #define FAN_PIN                              6
 #endif
-#define FAN2_PIN                               -1 //5
+#define FAN2_PIN                               5
 
 //
 // Misc. Functions
@@ -170,8 +170,8 @@
 #if ENABLED(REPRAPWORLD_GRAPHICAL_LCD) || ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
 
   #define LCD_PINS_RS                       A8  // CS chip select / SS chip slave select A8
-  #define LCD_PINS_ENABLE                   39 // STEP E3 //75MOSI //MOSI  // SID (MOSI) A2
-  #define LCD_PINS_D4                       63 //76SCK //SCK  // SCK (CLK) clock A9
+  #define LCD_PINS_ENABLE                   10 // STEP E3 //75MOSI //MOSI  // SID (MOSI) A2
+  #define LCD_PINS_D4                       4 //76SCK //SCK  // SCK (CLK) clock A9
 
   #define BTN_EN1                             20
   #define BTN_EN2                             21
@@ -179,3 +179,15 @@
 
 #endif // REPRAPWORLD_GRAPHICAL_LCD
 
+//MWORK IN
+#define MWORK_BOARD
+#define MWORK_IN1_PIN                              63
+#define MWORK_IN2_PIN                              53
+#define MWORK_IN3_PIN                              69
+#define MWORK_IN4_PIN                              70
+#define MWORK_IN5_PIN                              66
+//MWORK OUT
+#define MWORK_O1_PIN                              45
+#define MWORK_O2_PIN                              44
+#define MWORK_O3_PIN                              68
+#define MWORK_O4_PIN                              67
