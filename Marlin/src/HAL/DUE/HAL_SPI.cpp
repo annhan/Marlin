@@ -497,7 +497,7 @@
    *  6 :  125 - 156 kHz
    */
   void spiInit(uint8_t spiRate) {
-    SERIAL_ECHO_MSG(" MWORK SPI INIT RATE : " , spiRate);
+    //SERIAL_ECHO_MSG(" MWORK SPI INIT RATE : " , spiRate);
     switch (spiRate) {
       case 0:
         spiTransferTx = (pfnSpiTransfer)spiTransferTx0;
