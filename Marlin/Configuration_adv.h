@@ -1852,8 +1852,8 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MINIMUM_STEPPER_POST_DIR_DELAY 650
-#define MINIMUM_STEPPER_PRE_DIR_DELAY 650
+#define MINIMUM_STEPPER_POST_DIR_DELAY 6000  //iHSV60-30-40-48 need 6uS for delay
+#define MINIMUM_STEPPER_PRE_DIR_DELAY 6000
 
 /**
  * Minimum stepper driver pulse width (in µs)
@@ -1880,7 +1880,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MAXIMUM_STEPPER_RATE 500000
+#define MAXIMUM_STEPPER_RATE 150000
 
 // @section temperature
 
