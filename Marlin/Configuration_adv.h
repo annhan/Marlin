@@ -1863,7 +1863,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MINIMUM_STEPPER_PULSE 10
+#define MINIMUM_STEPPER_PULSE 4 //iHSV60-30-40-48 no less 2.5uS
 
 /**
  * Maximum stepping rate (in Hz) the stepper driver allows
@@ -1877,7 +1877,7 @@
  *
  * Override the default value based on the driver type set in Configuration.h.
  */
-#define MAXIMUM_STEPPER_RATE 150000
+#define MAXIMUM_STEPPER_RATE 200000  ////iHSV60-30-40-48  250k max
 
 // @section temperature
 
