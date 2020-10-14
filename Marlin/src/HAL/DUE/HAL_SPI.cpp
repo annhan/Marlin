@@ -53,7 +53,7 @@
   // Make sure GCC optimizes this file.
   // Note that this line triggers a bug in GCC which is fixed by casting.
   // See the note below.
-  #pragma once
+  //#pragma once
   //#pragma GCC optimize (3)
 
   typedef uint8_t (*pfnSpiTransfer)(uint8_t b);

@@ -1339,8 +1339,14 @@ void setup() {
     INIT_INOUT_MWORK();     
   #endif
   marlin_state = MF_RUNNING;
-
+  SETUP_LOG("enable() completed.");
+  ENABLE_AXIS_X();
+  ENABLE_AXIS_Y();
+  #if DISABLED(Z_LATE_ENABLE)
+    ENABLE_AXIS_Z();
+  #endif
   SETUP_LOG("setup() completed.");
+  
 }
 
 /**
