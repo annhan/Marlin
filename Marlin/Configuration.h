@@ -153,7 +153,8 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_ULTRATRONICS_PRO
+  //#define MOTHERBOARD BOARD_ULTRATRONICS_PRO
+  #define MOTHERBOARD BOARD_BTT_BTT002_V1_0
 #endif
 // Name displayed in the LCD "Ready" message and Info menu
 #define CUSTOM_MACHINE_NAME "MWORK"
