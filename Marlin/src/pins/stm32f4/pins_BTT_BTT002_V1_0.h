@@ -96,11 +96,17 @@
   #define Z_CS_PIN                          PE4
 #endif
 
-#define E0_STEP_PIN                         PD12
-#define E0_DIR_PIN                          PD13
-#define E0_ENABLE_PIN                       PD11
-#ifndef E0_CS_PIN
-  #define E0_CS_PIN                         PD7
+// Laser control
+#if HAS_CUTTER
+  #define SPINDLE_LASER_PWM_PIN             PD12
+  #define SPINDLE_LASER_ENA_PIN             PD13
+#else
+  #define E0_STEP_PIN                         PD12
+  #define E0_DIR_PIN                          PD13
+  #define E0_ENABLE_PIN                       PD11
+  #ifndef E0_CS_PIN
+    #define E0_CS_PIN                         PD7
+  #endif
 #endif
 
 //
@@ -117,6 +123,7 @@
     #define TMC_SW_SCK                      PB13
   #endif
 #endif
+
 
 #if HAS_TMC_UART
   /**
